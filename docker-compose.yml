@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  api:
+    container_name: nestjs_api_dev
+    image: nestjs-api-dev:1.0.0
+    build:
+      context: .
+      target: development
+      dockerfile: ./docker/api/Dockerfile
+    command: yarn start:debug
+    ports:
+      - 3000:3000
+      - 9229:9229
+#    networks:
+#      - nesjs-network
+    volumes:
+      - ./api/:/usr/src/app
+#      - /usr/src/app/node_modules
+    restart: unless-stopped
+  db:
+    image: mysql
+    container_name: db_dev
+    build:
+      context: .
+      dockerfile: ./docker/api/Dockerfile
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+      MYSQL_DATABASE: company
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pswd
+    ports:
+      - 6603:3306
+    volumes:
+      - ./docker/mysql/config:/etc/mysql/conf.d
+      - ./.data/mysql:/var/lib/mysql
+    restart: always
+  nginx:
+    depends_on:
+      - api
+    restart: always
+    volumes:
+      - ./docker/nginx/ssl:/var/ssl
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    build:
+      dockerfile: Dockerfile
+      context: ./docker/nginx
+    ports:
+      - "80:80"
+      - "443:443"
+
+#networks:
+#  nesjs-network:
