@@ -1,3 +1,9 @@
+**docker-compose up -d**
+
+**docker-compose exec api yarn install**
+
+**docker-compose exec api yarn build**
+
 **Generate ssl for local dev**
 
 `openssl req -x509 -out localhost.crt -keyout localhost.key \
