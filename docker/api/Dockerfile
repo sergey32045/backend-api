@@ -1,11 +1,11 @@
-FROM node:12.19.0-alpine3.9 AS development
+FROM node:16.13.1-alpine AS development
 
 WORKDIR /usr/src/app
 
 COPY ./api/package*.json ./
 #package*.json ./
 
-RUN npm install glob rimraf
+RUN npm install glob rimraf ts-node
 
 #RUN npm install --only=development
 

@@ -17,6 +17,13 @@ services:
     volumes:
       - ./api/:/usr/src/app
 #      - /usr/src/app/node_modules
+    depends_on:
+      - db
+    environment:
+      DB_DATABASE: "${MYSQL_DATABASE}"
+      DB_USER: "${MYSQL_USER}"
+      DB_PASSWORD: "${MYSQL_PASSWORD}"
+      DB_PORT: "${MYSQL_PORT}"
     restart: unless-stopped
   db:
     image: mysql
@@ -25,16 +32,15 @@ services:
       context: .
       dockerfile: ./docker/api/Dockerfile
     environment:
-      MYSQL_ROOT_PASSWORD: my-secret-pw
-      MYSQL_DATABASE: company
-      MYSQL_USER: user
-      MYSQL_PASSWORD: pswd
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
     ports:
-      - 6603:3306
+      - 6603:${MYSQL_PORT}
     volumes:
-      - ./docker/mysql/config:/etc/mysql/conf.d
       - ./.data/mysql:/var/lib/mysql
-    restart: always
+#    restart: always
   nginx:
     depends_on:
       - api
