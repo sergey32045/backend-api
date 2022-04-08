@@ -1,4 +1,4 @@
-FROM mysql
+FROM mysql:8.0
 # Add a database
 #ENV MYSQL_DATABASE company
 # Add the content of the sql-scripts/ directory to your image
@@ -6,4 +6,6 @@ FROM mysql
 # executed during container startup
 #COPY ./sql-scripts/ /docker-entrypoint-initdb.d/
 
-COPY ./config/my-custom.cnf /etc/mysql/conf.d
+COPY ./config/ /etc/mysql/conf.d
+
+CMD ["mysqld"]

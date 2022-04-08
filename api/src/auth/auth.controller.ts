@@ -12,7 +12,7 @@ import { AuthService } from './auth.service';
 import { RegisterUserDto } from './validation/RegisterUserDto';
 import { UsersService } from '../users/users.service';
 
-@Controller()
+@Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
@@ -20,13 +20,13 @@ export class AuthController {
   ) {}
 
   @UseGuards(LocalAuthGuard)
-  @Post('auth/login')
+  @Post('login')
   async login(@Request() req) {
     return this.authService.login(req.user);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
-  @Post('auth/register')
+  @Post('register')
   async register(@Body() registerUserDto: RegisterUserDto) {
     return this.userService.create(registerUserDto);
   }

@@ -16,7 +16,8 @@ services:
 #      - nesjs-network
     volumes:
       - ./api/:/usr/src/app
-#      - /usr/src/app/node_modules
+      - /usr/src/app/node_modules
+#      - ./api/node_modules:/usr/src/app/node_modules:r
     depends_on:
       - db
     environment:
@@ -26,11 +27,10 @@ services:
       DB_PORT: "${MYSQL_PORT}"
     restart: unless-stopped
   db:
-    image: mysql
     container_name: db_dev
     build:
-      context: .
-      dockerfile: ./docker/api/Dockerfile
+      context: ./docker/mysql
+      dockerfile: Dockerfile
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
       MYSQL_DATABASE: "${MYSQL_DATABASE}"
@@ -40,8 +40,8 @@ services:
       - 6603:${MYSQL_PORT}
     volumes:
       - ./.data/mysql:/var/lib/mysql
-#    restart: always
   nginx:
+    container_name: nginx_dev
     depends_on:
       - api
     restart: always

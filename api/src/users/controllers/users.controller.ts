@@ -1,4 +1,11 @@
-import { Controller, Request, Get, UseGuards, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+import {
+  Controller,
+  Request,
+  Get,
+  UseGuards,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+} from '@nestjs/common';
 import { UsersService } from '../users.service';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 

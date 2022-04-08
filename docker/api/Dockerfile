@@ -4,10 +4,11 @@ WORKDIR /usr/src/app
 
 COPY ./api/package*.json ./
 #package*.json ./
+RUN apk add --update python3 make g++ && rm -rf /var/cache/apk/*
 
-RUN npm install glob rimraf ts-node
+RUN npm install -g glob rimraf ts-node @nestjs/cli
 
-#RUN npm install --only=development
+RUN npm install
 
 COPY ./api .
 
