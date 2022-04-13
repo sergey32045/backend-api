@@ -1,5 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { User } from '../src/users/user.entity';
+import { User } from '../src/users/models/user.entity';
 import { name, internet } from 'faker';
 
 export class UsersSeed1641235751794 implements MigrationInterface {

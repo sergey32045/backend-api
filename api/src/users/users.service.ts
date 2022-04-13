@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { User } from './models/user.entity';
 import { RegisterUserDto } from '../auth/validation/RegisterUserDto';
 
 @Injectable()
@@ -33,6 +33,21 @@ export class UsersService {
     user.firstName = userData.firstName;
     user.lastName = userData.lastName;
     user.email = userData.email;
+    if (user.email) {
+      const existingUser = await this.findOneByEmail(user.email);
+      if (existingUser) {
+        throw new BadRequestException('User already exists');
+      }
+    }
     return this.usersRepository.save(user);
+  }
+
+  async markEmailAsConfirmed(email: string) {
+    return this.usersRepository.update(
+      { email },
+      {
+        isEmailConfirmed: true,
+      },
+    );
   }
 }

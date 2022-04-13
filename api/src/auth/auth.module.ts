@@ -10,6 +10,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { ConfigModule } from '@nestjs/config';
 import { GoogleOauthController } from './google/google-oauth.controller';
 import { GoogleOauthStrategy } from './google/google-oauth.strategy';
+import { EmailConfirmationService } from './email/email-confirmation.service';
 
 @Module({
   imports: [
@@ -21,7 +22,13 @@ import { GoogleOauthStrategy } from './google/google-oauth.strategy';
       signOptions: { expiresIn: '360s' },
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleOauthStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    GoogleOauthStrategy,
+    EmailConfirmationService,
+  ],
   controllers: [AuthController, GoogleOauthController],
   exports: [AuthService],
 })
