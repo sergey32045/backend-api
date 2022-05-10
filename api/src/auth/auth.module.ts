@@ -19,7 +19,7 @@ import { EmailConfirmationService } from './email/email-confirmation.service';
     PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '360s' },
+      signOptions: { expiresIn: '86400s' },
     }),
   ],
   providers: [

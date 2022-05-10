@@ -5,7 +5,7 @@ import {
   Request,
   UseGuards,
   UseInterceptors,
-  Query, Post, Body, Put, Param, Delete,
+  Query, Post, Body, Put, Param,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { TestService } from '../test.service';
@@ -13,7 +13,7 @@ import {CreateTestDto} from "../validation/CreateTestDto";
 import {UpdateTestDto} from "../validation/UpdateTestDto";
 
 @Controller('tests')
-export class TestController {
+export class CategoriesController {
   constructor(private testService: TestService) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -29,21 +29,8 @@ export class TestController {
     return this.testService.create(testData);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Put(':id')
+  @Put()
   async update(@Body() testData: UpdateTestDto, @Param('id') id: number) {
     return this.testService.update(id, testData);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Delete()
-  async delete(@Param('id') id: number) {
-    return this.testService.delete(id);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  async get(@Param('id') id: number) {
-    return this.testService.findOne(id);
   }
 }

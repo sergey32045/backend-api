@@ -30,8 +30,7 @@ export class UsersService {
   async create(userData: RegisterUserDto) {
     const user = new User();
     user.password = userData.password;
-    user.firstName = userData.firstName;
-    user.lastName = userData.lastName;
+    user.fullName = userData.fullName;
     user.email = userData.email;
     if (user.email) {
       const existingUser = await this.findOneByEmail(user.email);

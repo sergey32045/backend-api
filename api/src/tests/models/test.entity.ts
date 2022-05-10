@@ -3,10 +3,11 @@ import {
   Column,
   PrimaryGeneratedColumn,
   OneToOne,
-  OneToMany,
+  OneToMany, ManyToOne, JoinColumn, CreateDateColumn,
 } from 'typeorm';
 import { TestCategory } from './test-category.entity';
 import { Question } from './question.entity';
+import {Transform} from "class-transformer";
 
 @Entity('tests')
 export class Test {
@@ -14,7 +15,6 @@ export class Test {
   id: number;
 
   @Column({ unsigned: true, nullable: false })
-  @OneToOne(() => TestCategory)
   test_category_id: number;
 
   @Column({ type: 'text' })
@@ -23,6 +23,14 @@ export class Test {
   @Column({ type: 'text', nullable: false })
   title: string;
 
-  @OneToMany(() => Question, (question) => question.test_id)
+  @ManyToOne(() => Question, (question) => question.test_id)
   questions: Question[];
+
+  @Transform(({ value }) => value.title)
+  @ManyToOne(type => TestCategory)
+  @JoinColumn({ name: 'test_category_id' })
+  category: TestCategory;
+
+  @CreateDateColumn()
+  created_at: Date;
 }

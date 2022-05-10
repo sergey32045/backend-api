@@ -1,5 +1,7 @@
 **docker-compose up -d**
 
+**docker-compose rm -vf** (will remove only anonymous volumes.)
+
 **docker-compose exec api yarn install**
 
 **docker-compose exec api yarn build**

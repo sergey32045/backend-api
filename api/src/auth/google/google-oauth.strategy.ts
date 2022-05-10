@@ -43,8 +43,7 @@ export class GoogleOauthStrategy extends PassportStrategy(Strategy, 'google') {
       user = await this.usersService.create({
         email: emails[0].value,
         password: this.generatePassword(),
-        firstName: name.familyName,
-        lastName: name.givenName,
+        fullName: name.familyName,
       });
     }
     // Here a custom User object is returned. In the the repo I'm using a UsersService with repository pattern, learn more here: https://docs.nestjs.com/techniques/database
