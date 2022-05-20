@@ -18,16 +18,17 @@ pipelines:
         - step:
             #python image with aws-cli installed
             name: "Docker build images and push to registry"
+            image: python:3.7.4-alpine3.10
             services:
               - docker
             script:
-              - export BUILD_ID=$BITBUCKET_BRANCH_$BITBUCKET_COMMIT_$BITBUCKET_BUILD_NUMBER
-              - docker build -t ${AWS_REGISTRY_URL}:$BUILD_ID . -f ./docker/api/Dockerfile
-              - docker tag ${AWS_REGISTRY_URL}:$BUILD_ID ${AWS_REGISTRY_URL}
-              - pipe: atlassian/aws-ecr-push-image:1.3.0
-                variables:
-                  AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
-                  AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-                  AWS_DEFAULT_REGION: eu-central-1
-                  IMAGE_NAME: ${AWS_REGISTRY_URL}
-                  DEBUG: "true"
+        
+              - pip3 install awscli
+              - IMAGE="${AWS_REGISTRY_URL}"
+              - TAG=${BITBUCKET_BRANCH:$BITBUCKET_TAG}
+              - aws configure set aws_access_key_id "${AWS_ACCESS_KEY_ID}"
+              - aws configure set aws_secret_access_key "${AWS_SECRET_ACCESS_KEY}"
+              - eval $(aws ecr get-login --no-include-email --region eu-central-1 | sed 's;https://;;g')
+              - docker build -t $IMAGE:$TAG . -f ./docker/api/Dockerfile
+              - docker push $IMAGE:$TAG
+
