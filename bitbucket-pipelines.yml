@@ -22,7 +22,7 @@ pipelines:
               - docker
             script:
               - export BUILD_ID=$BITBUCKET_BRANCH_$BITBUCKET_COMMIT_$BITBUCKET_BUILD_NUMBER
-              - docker build -t ${AWS_REGISTRY_URL}:$BUILD_ID .
+              - docker-compose build -t ${AWS_REGISTRY_URL}:$BUILD_ID
               - docker tag ${AWS_REGISTRY_URL}:$BUILD_ID
               - pipe: atlassian/aws-ecr-push-image:1.3.0
                 variables:
