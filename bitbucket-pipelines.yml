@@ -30,4 +30,3 @@ pipelines:
                   AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
                   AWS_DEFAULT_REGION: eu-central-1
                   IMAGE_NAME: ${AWS_REGISTRY_URL}:development
-                  TAGS: "${AWS_REGISTRY_URL}:$BUILD_ID"
