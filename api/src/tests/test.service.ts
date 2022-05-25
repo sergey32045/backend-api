@@ -3,10 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Test } from './models/test.entity';
 import {FindConditions} from "typeorm/find-options/FindConditions";
-import {User} from "../users/models/user.entity";
 import {CreateTestDto} from "./validation/CreateTestDto";
 import {TestCategory} from "./models/test-category.entity";
 import {UpdateTestDto} from "./validation/UpdateTestDto";
+import {CreateCategoryDto} from "./validation/CreateCategoryDto";
 
 @Injectable()
 export class TestService {
@@ -16,6 +16,45 @@ export class TestService {
     @InjectRepository(TestCategory)
     private categoryRepository: Repository<TestCategory>,
   ) {}
+
+  async findAllCategories(): Promise<TestCategory[]> {
+    return this.categoryRepository.find({
+      relations: ['parent']
+    });
+  }
+
+  async createCategory(categoryData: CreateCategoryDto): Promise<TestCategory> {
+    const category = new TestCategory();
+    category.title = categoryData.title;
+    category.name = categoryData.name;
+    category.parent_id = categoryData.parent_id;
+
+    await this.checkCategoryData(categoryData)
+
+    return this.categoryRepository.save(category);
+  }
+
+  async deleteCategory(id: number) {
+    return this.categoryRepository.delete(id);
+  }
+
+  async updateCategory(id: number, categoryData: CreateCategoryDto): Promise<TestCategory> {
+    const category = await this.categoryRepository.findOne({ where: {id } });
+    if (!category) {
+      throw new BadRequestException('Category doesn\'t exists');
+    }
+    category.title = categoryData.title;
+    category.name = categoryData.name;
+    category.parent_id = categoryData.parent_id;
+
+    await this.checkCategoryData(categoryData)
+
+    return this.categoryRepository.save(category);
+  }
+
+  async findOneCategory(id: number): Promise<TestCategory> {
+    return this.categoryRepository.findOne({ where: {id}});
+  }
 
   async findAll(categoryId?: number): Promise<Test[]> {
     let where: FindConditions<Test> = {};
@@ -30,10 +69,19 @@ export class TestService {
   }
 
   async findOne(id: number): Promise<Test> {
-    return this.testsRepository.findOne(id);
+    return this.testsRepository.findOne({ where: {id}});
   }
 
-  private async checkData(data: CreateTestDto): Promise<void> {
+  private async checkCategoryData(categoryData: CreateCategoryDto) {
+    if (categoryData.parent_id) {
+      const parentCategory = await this.categoryRepository.findOne({ where: { id: categoryData.parent_id } });
+      if (!parentCategory) {
+        throw new BadRequestException('Parent category doesn\'t exists');
+      }
+    }
+  }
+
+  private async checkTestData(data: CreateTestDto): Promise<void> {
     if (data.test_category_id) {
       const category = await this.categoryRepository.findOne(data.test_category_id);
       if (!category) {
@@ -48,7 +96,7 @@ export class TestService {
     test.description = testData.description;
     test.test_category_id = testData.test_category_id;
 
-    await this.checkData(testData);
+    await this.checkTestData(testData);
 
     return this.testsRepository.save(test);
   }
@@ -58,13 +106,13 @@ export class TestService {
     if (!test) {
       throw new BadRequestException('Test doesn\'t exists');
     }
-    await this.checkData(update);
+    await this.checkTestData(update);
 
     test.title = update.title;
     test.description = update.description;
     test.test_category_id = update.test_category_id;
 
-    await this.checkData(update);
+    await this.checkTestData(update);
 
     return this.testsRepository.save(test);
   }

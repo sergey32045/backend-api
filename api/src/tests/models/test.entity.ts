@@ -3,7 +3,7 @@ import {
   Column,
   PrimaryGeneratedColumn,
   OneToOne,
-  OneToMany, ManyToOne, JoinColumn, CreateDateColumn,
+  OneToMany, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn,
 } from 'typeorm';
 import { TestCategory } from './test-category.entity';
 import { Question } from './question.entity';
@@ -17,10 +17,10 @@ export class Test {
   @Column({ unsigned: true, nullable: false })
   test_category_id: number;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'mediumtext' })
   description: string;
 
-  @Column({ type: 'text', nullable: false })
+  @Column({ type: 'mediumtext', nullable: false })
   title: string;
 
   @ManyToOne(() => Question, (question) => question.test_id)
@@ -33,4 +33,7 @@ export class Test {
 
   @CreateDateColumn()
   created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 }

@@ -36,7 +36,7 @@ export class TestController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete()
+  @Delete(':id')
   async delete(@Param('id') id: number) {
     return this.testService.delete(id);
   }

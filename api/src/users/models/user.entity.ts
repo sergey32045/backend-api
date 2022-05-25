@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, BeforeInsert } from 'typeorm';
+import {Entity, Column, PrimaryGeneratedColumn, BeforeInsert, CreateDateColumn} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
 
@@ -7,7 +7,7 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ name: 'full_name' })
   fullName: string;
 
   @Column()
@@ -17,11 +17,14 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column({ default: true })
+  @Column({ default: true, name: 'is_active' })
   isActive: boolean;
 
-  @Column({ default: false })
+  @Column({ default: false, name: 'is_email_confirmed' })
   isEmailConfirmed: boolean;
+
+  @CreateDateColumn()
+  created_at: Date;
 
   @BeforeInsert()
   async setPassword(password: string) {
