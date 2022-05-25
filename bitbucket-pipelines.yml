@@ -4,7 +4,13 @@
 # You can specify a custom docker image from Docker Hub as your build environment.
 
 image: node:16
-
+definitions:
+  services:
+    docker:
+      memory: 4096
+options:
+  docker: true
+  size: 2x
 pipelines:
   branches:
     master:
@@ -21,8 +27,8 @@ pipelines:
             image: python:3.7.4-alpine3.10
             services:
               - docker
+            size: 2x
             script:
-        
               - pip3 install awscli
               - IMAGE="${AWS_REGISTRY_URL}"
               - TAG=${BITBUCKET_BRANCH:$BITBUCKET_TAG}
@@ -31,4 +37,16 @@ pipelines:
               - eval $(aws ecr get-login --no-include-email --region eu-central-1 | sed 's;https://;;g')
               - docker build -t $IMAGE:$TAG . -f ./docker/api/Dockerfile
               - docker push $IMAGE:$TAG
+      - step:
+          name: "Deploy to prod"
+          script:
+            - pipe: atlassian/aws-ecs-deploy:1.6.2
+              variables:
+                AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID} # Optional if already defined in the context.
+                AWS_SECRET_ACCESS_KEY: ${AWS_ACCESS_KEY_ID} # Optional if already defined in the context.
+                AWS_DEFAULT_REGION: eu-central-1 # Optional if already defined in the context.
+                CLUSTER_NAME: 'super-cluster-4'
+                SERVICE_NAME: 'interviewboom-service'
+                TASK_DEFINITION: './deploy/task-definition.json' # Optional
+                FORCE_NEW_DEPLOYMENT: 'true' # Optional
 
