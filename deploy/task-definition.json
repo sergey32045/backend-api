@@ -1,5 +1,4 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:eu-central-1:861579771046:task-definition/My-new-task-definition:13",
     "containerDefinitions": [
         {
             "name": "interview-API",
@@ -104,7 +103,6 @@
     ],
     "family": "My-new-task-definition",
     "networkMode": "bridge",
-    "revision": 13,
     "volumes": [
         {
             "name": "volume-for-containers",
@@ -118,37 +116,10 @@
             }
         }
     ],
-    "status": "ACTIVE",
-    "requiresAttributes": [
-        {
-            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.ecr-auth"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
-        },
-        {
-            "name": "ecs.capability.efs"
-        },
-        {
-            "name": "ecs.capability.container-ordering"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.25"
-        }
-    ],
     "placementConstraints": [],
-    "compatibilities": [
-        "EXTERNAL",
-        "EC2"
-    ],
     "requiresCompatibilities": [
         "EC2"
     ],
     "cpu": "1024",
-    "memory": "1024",
-    "registeredAt": "2022-05-24T17:38:52.404000+03:00",
-    "registeredBy": "arn:aws:iam::861579771046:user/RomanUdemy"
+    "memory": "1024"
 }
