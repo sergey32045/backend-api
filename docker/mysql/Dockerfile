@@ -6,6 +6,10 @@ FROM mysql:8.0
 # executed during container startup
 #COPY ./sql-scripts/ /docker-entrypoint-initdb.d/
 
-COPY ./config/ /etc/mysql/conf.d
+#COPY ./config/ /etc/mysql/conf.d
+
+VOLUME ./.data/mysql /var/lib/mysql
+
+EXPOSE 3306
 
 CMD ["mysqld"]

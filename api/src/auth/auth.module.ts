@@ -11,6 +11,7 @@ import { ConfigModule } from '@nestjs/config';
 import { GoogleOauthController } from './google/google-oauth.controller';
 import { GoogleOauthStrategy } from './google/google-oauth.strategy';
 import { EmailConfirmationService } from './email/email-confirmation.service';
+import {SendgridService} from "../email/SendgridService";
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { EmailConfirmationService } from './email/email-confirmation.service';
     JwtStrategy,
     GoogleOauthStrategy,
     EmailConfirmationService,
+    SendgridService
   ],
   controllers: [AuthController, GoogleOauthController],
   exports: [AuthService],

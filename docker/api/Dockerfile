@@ -15,4 +15,7 @@ RUN npm install -g glob rimraf ts-node @nestjs/cli && \
 
 COPY ./api .
 
+EXPOSE 3000
+
+CMD [ "yarn", "start:debug" ]
 #RUN npm run build

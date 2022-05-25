@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -29,25 +30,9 @@ import {TestsModule} from "./tests/tests.module";
         database: configService.get('database.db'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         // synchronize shouldn't be used in production - otherwise you can lose production data.
-        synchronize: process.env.NODE_ENV != 'production',
+        synchronize: false,
         logging: true,
-        // autoLoadEntities: true,
       }),
-    }),
-    MailerModule.forRoot({
-      transport: {
-        host: process.env.SMPT_HOST,
-        port: 465,
-        ignoreTLS: false,
-        secure: true,
-        auth: {
-          user: process.env.SMPT_USERNAME,
-          pass: process.env.SMPT_PASSWORD,
-        },
-      },
-      defaults: {
-        from: '"nest-modules" <modules@nestjs.com>',
-      },
     }),
     AuthModule,
   ],

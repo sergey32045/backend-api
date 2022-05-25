@@ -6,13 +6,14 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { jwtConstants, emailConfirmationUrl } from '../constants';
 import { User } from '../../users/models/user.entity';
 import { UsersService } from '../../users/users.service';
+import {SendgridService} from "../../email/SendgridService";
 
 @Injectable()
 export class EmailConfirmationService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-    private readonly emailService: MailerService,
+    private readonly sendgridService: SendgridService,
     private readonly userService: UsersService,
   ) {}
 
@@ -28,16 +29,17 @@ export class EmailConfirmationService {
   }
 
   public sendMail(email: string, token: string) {
-    const url = `${process.env.CLIENT_HOST}${emailConfirmationUrl}?token=${token}`;
-    const text = `Welcome to the application. To confirm the email address, click here: ${url}`;
+    const host = this.configService.get<string>('email.clientHost')
+    const url = `${host}${emailConfirmationUrl}?token=${token}`;
+    const text = `<h1>Welcome to InterviewBoom! To confirm the email address, click here: ${url}</h1>`;
 
-    return this.emailService.sendMail({
-      to: email, // list of receivers
-      from: 'noreply@nestjs.com', // sender address
-      subject: 'Testing Nest MailerModule ✔', // Subject line
-      text, // plaintext body
-      // html: '<b>welcome</b>', // HTML body content
-    });
+    const mail = {
+      to: email,
+      subject: 'Email confirmation',
+      html: text
+    };
+
+    return this.sendgridService.send(mail);
   }
 
   public async confirmEmail(email: string) {

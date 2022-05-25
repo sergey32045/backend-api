@@ -1,0 +1,154 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:eu-central-1:861579771046:task-definition/My-new-task-definition:13",
+    "containerDefinitions": [
+        {
+            "name": "interview-API",
+            "image": "861579771046.dkr.ecr.eu-central-1.amazonaws.com/interviewboom:latest",
+            "cpu": 0,
+            "links": [
+                "interview-database"
+            ],
+            "portMappings": [
+                {
+                    "containerPort": 3000,
+                    "hostPort": 3000,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "DB_HOST",
+                    "value": "interview-database"
+                },
+                {
+                    "name": "DB_PORT",
+                    "value": "3306"
+                },
+                {
+                    "name": "DB_DATABASE",
+                    "value": "company"
+                },
+                {
+                    "name": "DB_USER",
+                    "value": "user"
+                },
+                {
+                    "name": "DB_PASSWORD",
+                    "value": "pswd"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "dependsOn": [
+                {
+                    "containerName": "interview-database",
+                    "condition": "START"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/My-new-task-definition",
+                    "awslogs-region": "eu-central-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        },
+        {
+            "name": "interview-database",
+            "image": "861579771046.dkr.ecr.eu-central-1.amazonaws.com/interviewboom-db",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 3306,
+                    "hostPort": 3306,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": false,
+            "environment": [
+                {
+                    "name": "MYSQL_DATABASE",
+                    "value": "company"
+                },
+                {
+                    "name": "MYSQL_PASSWORD",
+                    "value": "pswd"
+                },
+                {
+                    "name": "MYSQL_ROOT_PASSWORD",
+                    "value": "my-secret-pw"
+                },
+                {
+                    "name": "MYSQL_USER",
+                    "value": "user"
+                }
+            ],
+            "mountPoints": [
+                {
+                    "sourceVolume": "volume-for-containers",
+                    "containerPath": "/.data/mysql"
+                }
+            ],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/My-new-task-definition",
+                    "awslogs-region": "eu-central-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            }
+        }
+    ],
+    "family": "My-new-task-definition",
+    "networkMode": "bridge",
+    "revision": 13,
+    "volumes": [
+        {
+            "name": "volume-for-containers",
+            "efsVolumeConfiguration": {
+                "fileSystemId": "fs-07aa12c781a81bb28",
+                "rootDirectory": "/",
+                "transitEncryption": "DISABLED",
+                "authorizationConfig": {
+                    "iam": "DISABLED"
+                }
+            }
+        }
+    ],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.logging-driver.awslogs"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "ecs.capability.efs"
+        },
+        {
+            "name": "ecs.capability.container-ordering"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.25"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EXTERNAL",
+        "EC2"
+    ],
+    "requiresCompatibilities": [
+        "EC2"
+    ],
+    "cpu": "1024",
+    "memory": "1024",
+    "registeredAt": "2022-05-24T17:38:52.404000+03:00",
+    "registeredBy": "arn:aws:iam::861579771046:user/RomanUdemy"
+}

@@ -5,32 +5,51 @@ import {
   Request,
   UseGuards,
   UseInterceptors,
-  Query, Post, Body, Put, Param,
+  Post, Body, Put, Param, Delete,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { TestService } from '../test.service';
-import {CreateTestDto} from "../validation/CreateTestDto";
-import {UpdateTestDto} from "../validation/UpdateTestDto";
+import {CreateCategoryDto} from "../validation/CreateCategoryDto";
+import {ApiResponse} from "@nestjs/swagger";
+import {TestCategory} from "../models/test-category.entity";
 
-@Controller('tests')
+@Controller('test-categories')
 export class CategoriesController {
   constructor(private testService: TestService) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
   @UseGuards(JwtAuthGuard)
   @Get()
-  async getAll(@Request() req, @Query('categoryId') categoryId?: number) {
-    return this.testService.findAll(categoryId);
+  async getAll(@Request() req) {
+    return this.testService.findAllCategories();
   }
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() testData: CreateTestDto) {
-    return this.testService.create(testData);
+  async create(@Body() categoryData: CreateCategoryDto) {
+    return this.testService.createCategory(categoryData);
   }
 
-  @Put()
-  async update(@Body() testData: UpdateTestDto, @Param('id') id: number) {
-    return this.testService.update(id, testData);
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  async update(@Body() categoryData: CreateCategoryDto, @Param('id') id: number) {
+    return this.testService.updateCategory(id, categoryData);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'The found record',
+    type: TestCategory,
+  })
+  async get(@Param('id') id: number) {
+    return this.testService.findOneCategory(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  async delete(@Param('id') id: number) {
+    return this.testService.deleteCategory(id);
   }
 }
