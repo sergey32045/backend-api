@@ -47,6 +47,6 @@ pipelines:
                 AWS_DEFAULT_REGION: eu-central-1 # Optional if already defined in the context.
                 CLUSTER_NAME: 'super-cluster-4'
                 SERVICE_NAME: 'interviewboom-service'
-#                TASK_DEFINITION: './deploy/task-definition.json' # Optional
+                TASK_DEFINITION: './deploy/task-definition.json' # Optional
                 FORCE_NEW_DEPLOYMENT: 'true' # Optional
 
