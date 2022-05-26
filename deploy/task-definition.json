@@ -56,7 +56,7 @@
         },
         {
             "name": "interview-database",
-            "image": "861579771046.dkr.ecr.eu-central-1.amazonaws.com/interviewboom-db",
+            "image": "861579771046.dkr.ecr.eu-central-1.amazonaws.com/interviewboom-db:master",
             "cpu": 0,
             "portMappings": [
                 {
