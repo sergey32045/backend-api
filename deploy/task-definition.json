@@ -2,7 +2,7 @@
     "containerDefinitions": [
         {
             "name": "interview-API",
-            "image": "861579771046.dkr.ecr.eu-central-1.amazonaws.com/interviewboom:latest",
+            "image": "861579771046.dkr.ecr.eu-central-1.amazonaws.com/interviewboom:master",
             "cpu": 0,
             "links": [
                 "interview-database"
