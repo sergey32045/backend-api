@@ -39,7 +39,9 @@ pipelines:
               - docker push $IMAGE:$TAG
       - step:
           name: "Deploy to prod"
+          image: python:3.7.4-alpine3.10
           script:
+            - pip3 install awscli
             - /bin/bash ./deploy/run-migrations.sh
             - pipe: atlassian/aws-ecs-deploy:1.6.2
               variables:
