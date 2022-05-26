@@ -40,6 +40,7 @@ pipelines:
       - step:
           name: "Deploy to prod"
           script:
+            - /bin/bash ./deploy/run-migrations.sh
             - pipe: atlassian/aws-ecs-deploy:1.6.2
               variables:
                 AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID} # Optional if already defined in the context.
@@ -49,4 +50,7 @@ pipelines:
                 SERVICE_NAME: 'uuuuuuu'
                 TASK_DEFINITION: './deploy/task-definition.json' # Optional
                 FORCE_NEW_DEPLOYMENT: 'true' # Optional
-
+#      - step:
+#          name: "Run db migrations"
+#          script:
+#            - /bin/bash ./deploy/run-migrations.sh

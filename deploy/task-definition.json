@@ -42,7 +42,7 @@
             "dependsOn": [
                 {
                     "containerName": "interview-database",
-                    "condition": "START"
+                    "condition": "HEALTHY"
                 }
             ],
             "logConfiguration": {
@@ -87,7 +87,7 @@
             "mountPoints": [
                 {
                     "sourceVolume": "volume-for-containers",
-                    "containerPath": "/.data/mysql"
+                    "containerPath": "/var/lib/mysql"
                 }
             ],
             "volumesFrom": [],
@@ -98,6 +98,15 @@
                     "awslogs-region": "eu-central-1",
                     "awslogs-stream-prefix": "ecs"
                 }
+            },
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "mysqladmin ping -h 127.0.0.1 -u user --password=pswd"
+                ],
+                "interval": 15,
+                "timeout": 20,
+                "retries": 10
             }
         }
     ],
