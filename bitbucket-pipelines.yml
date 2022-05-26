@@ -35,7 +35,7 @@ pipelines:
               - TAG=${BITBUCKET_BRANCH:$BITBUCKET_TAG}
               - aws configure set aws_access_key_id "${AWS_ACCESS_KEY_ID}"
               - aws configure set aws_secret_access_key "${AWS_SECRET_ACCESS_KEY}"
-              - eval $(aws ecr get-login --no-include-email --region eu-central-1 | sed 's;https://;;g')
+              - eval $(aws ecr get-login --no-include-email --region ${AWS_DEFAULT_REGION} | sed 's;https://;;g')
               - docker build -t $IMAGE:$TAG . -f ./docker/api/Dockerfile
               - docker push $IMAGE:$TAG
               - docker build -t $IMAGE_DB:$TAG . -f ./docker/mysql/Dockerfile
@@ -45,17 +45,12 @@ pipelines:
           image: python:3.7.4-alpine3.10
           script:
             - pip3 install awscli
-            - /bin/bash ./deploy/run-migrations.sh
             - pipe: atlassian/aws-ecs-deploy:1.6.2
               variables:
-                AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID} # Optional if already defined in the context.
-                AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY} # Optional if already defined in the context.
-                AWS_DEFAULT_REGION: eu-central-1 # Optional if already defined in the context.
-                CLUSTER_NAME: 'super-cluster-4'
-                SERVICE_NAME: 'uuuuuuu'
-                TASK_DEFINITION: './deploy/task-definition.json' # Optional
-                FORCE_NEW_DEPLOYMENT: 'true' # Optional
-#      - step:
-#          name: "Run db migrations"
-#          script:
-#            - /bin/bash ./deploy/run-migrations.sh
+                AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+                AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+                AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
+                CLUSTER_NAME: ${AWS_ECS_CLUSTER}
+                SERVICE_NAME: ${AWS_ECS_SERVICE}
+                TASK_DEFINITION: './deploy/task-definition.json'
+                FORCE_NEW_DEPLOYMENT: 'true'
