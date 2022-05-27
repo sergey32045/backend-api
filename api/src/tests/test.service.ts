@@ -7,6 +7,7 @@ import {CreateTestDto} from "./validation/CreateTestDto";
 import {TestCategory} from "./models/test-category.entity";
 import {UpdateTestDto} from "./validation/UpdateTestDto";
 import {CreateCategoryDto} from "./validation/CreateCategoryDto";
+import {QueryCategoriesDto} from "./validation/QueryCategoriesDto";
 
 @Injectable()
 export class TestService {
@@ -17,9 +18,11 @@ export class TestService {
     private categoryRepository: Repository<TestCategory>,
   ) {}
 
-  async findAllCategories(): Promise<TestCategory[]> {
+  async findAllCategories(query: QueryCategoriesDto): Promise<TestCategory[]> {
     return this.categoryRepository.find({
-      relations: ['parent']
+      relations: ['parent'],
+      take: query.limit,
+      skip: query.page - 1
     });
   }
 

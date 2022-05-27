@@ -5,23 +5,26 @@ import {
   Request,
   UseGuards,
   UseInterceptors,
-  Post, Body, Put, Param, Delete,
+  Post, Body, Put, Param, Delete, Query,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { TestService } from '../test.service';
 import {CreateCategoryDto} from "../validation/CreateCategoryDto";
 import {ApiResponse} from "@nestjs/swagger";
 import {TestCategory} from "../models/test-category.entity";
+import {QueryCategoriesDto} from "../validation/QueryCategoriesDto";
 
 @Controller('test-categories')
 export class CategoriesController {
   constructor(private testService: TestService) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
-  @UseGuards(JwtAuthGuard)
   @Get()
-  async getAll(@Request() req) {
-    return this.testService.findAllCategories();
+  async getAll(
+      @Request() req,
+      @Query() query: QueryCategoriesDto
+  ) {
+    return this.testService.findAllCategories(query);
   }
 
   @UseGuards(JwtAuthGuard)

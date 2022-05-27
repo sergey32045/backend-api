@@ -1,4 +1,4 @@
-import {IsInt, IsNotEmpty, MaxLength} from 'class-validator';
+import {IsInt, IsNotEmpty, IsOptional, MaxLength} from 'class-validator';
 import {ApiProperty} from "@nestjs/swagger";
 
 export class CreateCategoryDto {
@@ -8,6 +8,7 @@ export class CreateCategoryDto {
 
   @IsInt()
   @ApiProperty({ example: 1, description: 'Parent category ID' })
+  @IsOptional()
   parent_id: number;
 
   @IsNotEmpty()
