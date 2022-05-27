@@ -8,6 +8,7 @@ import {TestCategory} from "./models/test-category.entity";
 import {UpdateTestDto} from "./validation/UpdateTestDto";
 import {CreateCategoryDto} from "./validation/CreateCategoryDto";
 import {QueryCategoriesDto} from "./validation/QueryCategoriesDto";
+import {QueryTestsDto} from "./validation/QueryTestsDto";
 
 @Injectable()
 export class TestService {
@@ -59,8 +60,10 @@ export class TestService {
     return this.categoryRepository.findOne({ where: {id}});
   }
 
-  async findAll(categoryId?: number): Promise<Test[]> {
+  async findAll(query: QueryTestsDto): Promise<Test[]> {
     let where: FindConditions<Test> = {};
+
+    const { categoryId, page, limit } = query;
 
     if (categoryId) {
        where = { test_category_id: categoryId }
@@ -68,6 +71,8 @@ export class TestService {
     return this.testsRepository.find({
       where,
       relations: ['questions', 'category'],
+      skip: page - 1,
+      take: limit
     });
   }
 

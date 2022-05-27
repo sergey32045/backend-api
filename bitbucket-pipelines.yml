@@ -35,7 +35,7 @@ pipelines:
               - aws configure set aws_access_key_id "${AWS_ACCESS_KEY_ID}"
               - aws configure set aws_secret_access_key "${AWS_SECRET_ACCESS_KEY}"
               - eval $(aws ecr get-login --no-include-email --region ${AWS_DEFAULT_REGION} | sed 's;https://;;g')
-              - docker build -t $IMAGE:$TAG . -f ./docker/api/Dockerfile
+              - docker build --target production -t $IMAGE:$TAG . -f ./docker/api/Dockerfile
               - docker push $IMAGE:$TAG
       - step:
           name: "Deploy to prod"

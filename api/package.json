@@ -1,7 +1,7 @@
 {
   "name": "interview-api",
   "version": "0.0.1",
-  "description": "",
+  "description": "InterviewBoom API",
   "author": "Roman Morokhovskyi",
   "private": true,
   "license": "UNLICENSED",
