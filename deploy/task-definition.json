@@ -86,7 +86,7 @@
             ],
             "mountPoints": [
                 {
-                    "sourceVolume": "volume-for-containers",
+                    "sourceVolume": "volume-docker",
                     "containerPath": "/var/lib/mysql"
                 }
             ],
@@ -122,6 +122,14 @@
                 "authorizationConfig": {
                     "iam": "DISABLED"
                 }
+            }
+        },
+        {
+            "name": "volume-docker",
+            "dockerVolumeConfiguration": {
+                "scope": "shared",
+                "autoprovision": true,
+                "driver": "local"
             }
         }
     ],
