@@ -31,6 +31,7 @@
         }
     ],
     "family": "My-new-task-definition",
+    "executionRoleArn": "arn:aws:iam::861579771046:role/ecsTaskExecutionRole",
     "networkMode": "bridge",
     "placementConstraints": [],
     "requiresCompatibilities": [
