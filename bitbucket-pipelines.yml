@@ -31,20 +31,15 @@ pipelines:
             script:
               - pip3 install awscli
               - IMAGE="${AWS_REGISTRY_URL}"
-              - IMAGE_DB="${AWS_REGISTRY_URL_DB}"
               - TAG=${BITBUCKET_BRANCH:$BITBUCKET_TAG}
               - aws configure set aws_access_key_id "${AWS_ACCESS_KEY_ID}"
               - aws configure set aws_secret_access_key "${AWS_SECRET_ACCESS_KEY}"
               - eval $(aws ecr get-login --no-include-email --region ${AWS_DEFAULT_REGION} | sed 's;https://;;g')
               - docker build -t $IMAGE:$TAG . -f ./docker/api/Dockerfile
               - docker push $IMAGE:$TAG
-              - docker build -t $IMAGE_DB:$TAG . -f ./docker/mysql/Dockerfile
-              - docker push $IMAGE_DB:$TAG
       - step:
           name: "Deploy to prod"
-          image: python:3.7.4-alpine3.10
           script:
-            - pip3 install awscli
             - pipe: atlassian/aws-ecs-deploy:1.6.2
               variables:
                 AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
