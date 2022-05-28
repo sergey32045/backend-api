@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import {RequestMethod, ValidationPipe} from '@nestjs/common';
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
 
 async function bootstrap() {
@@ -11,7 +11,12 @@ async function bootstrap() {
     transform: true,
   }));
   app.enableCors();
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', { exclude: [
+    {
+      path: '.well-known/pki-validation/3261FC6A37BFF23693EFD1B4C7AE49D7.txt',
+      method: RequestMethod.GET
+    },
+    ]});
 
   const config = new DocumentBuilder()
       .setTitle('InterviewBoom API doc')
