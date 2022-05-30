@@ -9,6 +9,10 @@ import {UpdateTestDto} from "./validation/UpdateTestDto";
 import {CreateCategoryDto} from "./validation/CreateCategoryDto";
 import {QueryCategoriesDto} from "./validation/QueryCategoriesDto";
 import {QueryTestsDto} from "./validation/QueryTestsDto";
+import {Question} from "./models/question.entity";
+import {CreateQuestionDto} from "./validation/CreateQuestionDto";
+import {Label} from "./models/label.entity";
+import {UpdateQuestionDto} from "./validation/UpdateQuestionDto";
 
 @Injectable()
 export class TestService {
@@ -17,7 +21,60 @@ export class TestService {
     private testsRepository: Repository<Test>,
     @InjectRepository(TestCategory)
     private categoryRepository: Repository<TestCategory>,
+    @InjectRepository(Question)
+    private questionRepository: Repository<Question>,
+    @InjectRepository(Label)
+    private labelRepository: Repository<Label>
   ) {}
+
+  async getQuestions(testId: number): Promise<Question[]> {
+    return this.questionRepository.find({
+      where: {
+        test_id: testId
+      },
+      relations: ['labels'],
+    });
+  }
+
+  async updateQuestion(id: number, data: UpdateQuestionDto) {
+    const question = await this.questionRepository.findOne({ where: {id} });
+    if (!question) {
+      throw new BadRequestException('Question doesn\'t exists');
+    }
+
+    question.question = data.question;
+    question.level = data.level;
+
+    if (data.labelIds) {
+      const labels = await this.labelRepository.findByIds(data.labelIds);
+      console.log(labels, 'labels')
+      question.labels = labels;
+    }
+
+    return this.questionRepository.save(question);
+  }
+
+  async createQuestion(testId: number, data: CreateQuestionDto) {
+    const question = new Question();
+    question.question = data.question;
+    question.level = data.level;
+    question.test_id = testId;
+
+    if (data.labelIds) {
+      const labels = await this.labelRepository.findByIds(data.labelIds);
+      question.labels = labels;
+    }
+
+    return this.questionRepository.save(question);
+  }
+
+  async createLabel(data: { title: string }): Promise<Label> {
+    if (!data.title) {
+       throw new BadRequestException('title is empty')
+    }
+
+    return this.labelRepository.save(data);
+  }
 
   async findAllCategories(query: QueryCategoriesDto): Promise<TestCategory[]> {
     return this.categoryRepository.find({

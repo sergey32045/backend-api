@@ -1,5 +1,14 @@
-import {Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToOne, OneToMany, JoinColumn} from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  ManyToMany,
+  JoinTable
+} from 'typeorm';
 import { Test } from './test.entity';
+import {Label} from "./label.entity";
 
 @Entity('questions')
 export class Question {
@@ -21,4 +30,8 @@ export class Question {
   @ManyToOne(() => Test, (test) => test.questions)
   @JoinColumn({name: 'test_id', referencedColumnName: 'id'})
   test: Test;
+
+  @ManyToMany(() => Label)
+  @JoinTable({ name: 'question_label', joinColumn: { name: 'question_id' }, inverseJoinColumn: { name: 'label_id' } })
+  labels: Label[];
 }
