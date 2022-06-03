@@ -14,19 +14,13 @@ options:
 pipelines:
   branches:
     master:
-      - parallel:
-        - step:
-            name: "Install dependencies"
-            caches:
-                - node
-            script:
-                - cd api && yarn install
-        - step:
-            name: "Linters"
-            caches:
+      - step:
+          name: "Linters"
+          caches:
               - node
-            script:
-              - cd api && yarn format:check
+          script:
+              - cd api && yarn install
+              - yarn format:check
       - step:
           #python image with aws-cli installed
           name: "Docker build images and push to registry"
