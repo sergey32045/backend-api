@@ -6,8 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from './config/configuration';
 import { AuthModule } from './auth/auth.module';
-import { MailerModule } from '@nestjs-modules/mailer';
-import {TestsModule} from "./tests/tests.module";
+import { TestsModule } from './tests/tests.module';
 
 @Module({
   imports: [

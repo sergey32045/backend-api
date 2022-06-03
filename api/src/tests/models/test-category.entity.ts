@@ -3,11 +3,13 @@ import {
   Column,
   PrimaryGeneratedColumn,
   OneToOne,
-  OneToMany, ManyToOne, JoinColumn,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Test } from './test.entity';
-import {Transform} from "class-transformer";
-import {ApiProperty} from "@nestjs/swagger";
+import { Transform } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('test_categories')
 export class TestCategory {
@@ -27,8 +29,8 @@ export class TestCategory {
   @Column({ type: 'int', unsigned: true, nullable: true })
   parent_id: number;
 
-  @Transform(({ value }) => value ? value.title : null)
-  @ManyToOne(type => TestCategory)
+  @Transform(({ value }) => (value ? value.title : null))
+  @ManyToOne((type) => TestCategory)
   @JoinColumn({ name: 'parent_id' })
   parent: TestCategory;
 

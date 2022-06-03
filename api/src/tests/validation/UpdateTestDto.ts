@@ -1,4 +1,4 @@
-import {IsInt, MaxLength} from 'class-validator';
+import { IsInt, MaxLength } from 'class-validator';
 
 export class UpdateTestDto {
   @IsInt()

@@ -5,15 +5,20 @@ import {
   Request,
   UseGuards,
   UseInterceptors,
-  Query, Post, Body, Put, Param, Delete,
+  Query,
+  Post,
+  Body,
+  Put,
+  Param,
+  Delete,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { TestService } from '../test.service';
-import {CreateTestDto} from "../validation/CreateTestDto";
-import {UpdateTestDto} from "../validation/UpdateTestDto";
-import {QueryTestsDto} from "../validation/QueryTestsDto";
-import {ApiResponse} from "@nestjs/swagger";
-import {Test} from "../models/test.entity";
+import { CreateTestDto } from '../validation/CreateTestDto';
+import { UpdateTestDto } from '../validation/UpdateTestDto';
+import { QueryTestsDto } from '../validation/QueryTestsDto';
+import { ApiResponse } from '@nestjs/swagger';
+import { Test } from '../models/test.entity';
 
 @Controller('tests')
 export class TestController {

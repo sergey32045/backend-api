@@ -5,15 +5,20 @@ import {
   Request,
   UseGuards,
   UseInterceptors,
-  Post, Body, Put, Param, Delete,
+  Post,
+  Body,
+  Put,
+  Param,
+  Delete,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { TestService } from '../test.service';
-import {ApiResponse} from "@nestjs/swagger";
-import {Test} from "../models/test.entity";
-import {Question} from "../models/question.entity";
-import {CreateQuestionDto} from "../validation/CreateQuestionDto";
-import {UpdateQuestionDto} from "../validation/UpdateQuestionDto";
+import { ApiResponse } from '@nestjs/swagger';
+import { Test } from '../models/test.entity';
+import { Question } from '../models/question.entity';
+import { CreateQuestionDto } from '../validation/CreateQuestionDto';
+import { UpdateQuestionDto } from '../validation/UpdateQuestionDto';
+import { GetQuestionsParams } from '../validation/GetQuestionsParams';
 
 @Controller('tests/:testid/questions')
 export class QuestionsController {
@@ -26,8 +31,8 @@ export class QuestionsController {
   })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  async getAll(@Request() req, @Param('testid') testId: number) {
-    return this.testService.getQuestions(testId);
+  async getAll(@Request() req, @Param() params: GetQuestionsParams) {
+    return this.testService.getQuestions(params);
   }
 
   @ApiResponse({
@@ -37,7 +42,10 @@ export class QuestionsController {
   })
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() data: CreateQuestionDto, @Param('testid') testId: number) {
+  async create(
+    @Body() data: CreateQuestionDto,
+    @Param('testid') testId: number,
+  ) {
     return this.testService.createQuestion(testId, data);
   }
 
@@ -54,7 +62,7 @@ export class QuestionsController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async delete(@Param('id') id: number) {
-    return this.testService.delete(id);
+  async delete(@Param() params: GetQuestionsParams) {
+    return this.testService.deleteQuestion(params.id);
   }
 }

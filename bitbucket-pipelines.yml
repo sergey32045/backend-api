@@ -22,21 +22,27 @@ pipelines:
             script:
                 - cd api && yarn install
         - step:
-            #python image with aws-cli installed
-            name: "Docker build images and push to registry"
-            image: python:3.7.4-alpine3.10
-            services:
-              - docker
-            size: 2x
+            name: "Linters"
+            caches:
+              - node
             script:
-              - pip3 install awscli
-              - IMAGE="${AWS_REGISTRY_URL}"
-              - TAG=${BITBUCKET_BRANCH:$BITBUCKET_TAG}
-              - aws configure set aws_access_key_id "${AWS_ACCESS_KEY_ID}"
-              - aws configure set aws_secret_access_key "${AWS_SECRET_ACCESS_KEY}"
-              - eval $(aws ecr get-login --no-include-email --region ${AWS_DEFAULT_REGION} | sed 's;https://;;g')
-              - docker build --target production -t $IMAGE:$TAG . -f ./docker/api/Dockerfile
-              - docker push $IMAGE:$TAG
+              - cd api && yarn format:check
+      - step:
+          #python image with aws-cli installed
+          name: "Docker build images and push to registry"
+          image: python:3.7.4-alpine3.10
+          services:
+            - docker
+          size: 2x
+          script:
+            - pip3 install awscli
+            - IMAGE="${AWS_REGISTRY_URL}"
+            - TAG=${BITBUCKET_BRANCH:$BITBUCKET_TAG}
+            - aws configure set aws_access_key_id "${AWS_ACCESS_KEY_ID}"
+            - aws configure set aws_secret_access_key "${AWS_SECRET_ACCESS_KEY}"
+            - eval $(aws ecr get-login --no-include-email --region ${AWS_DEFAULT_REGION} | sed 's;https://;;g')
+            - docker build --target production -t $IMAGE:$TAG . -f ./docker/api/Dockerfile
+            - docker push $IMAGE:$TAG
       - step:
           name: "Deploy to prod"
           script:

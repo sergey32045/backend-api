@@ -6,7 +6,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { jwtConstants, emailConfirmationUrl } from '../constants';
 import { User } from '../../users/models/user.entity';
 import { UsersService } from '../../users/users.service';
-import {SendgridService} from "../../email/SendgridService";
+import { SendgridService } from '../../email/SendgridService';
 
 @Injectable()
 export class EmailConfirmationService {
@@ -29,14 +29,14 @@ export class EmailConfirmationService {
   }
 
   public sendMail(email: string, token: string) {
-    const host = this.configService.get<string>('email.clientHost')
+    const host = this.configService.get<string>('email.clientHost');
     const url = `${host}${emailConfirmationUrl}?token=${token}`;
     const text = `<h1>Welcome to InterviewBoom! To confirm the email address, click here: ${url}</h1>`;
 
     const mail = {
       to: email,
       subject: 'Email confirmation',
-      html: text
+      html: text,
     };
 
     return this.sendgridService.send(mail);

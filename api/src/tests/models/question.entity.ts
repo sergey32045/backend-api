@@ -5,10 +5,10 @@ import {
   ManyToOne,
   JoinColumn,
   ManyToMany,
-  JoinTable
+  JoinTable,
 } from 'typeorm';
 import { Test } from './test.entity';
-import {Label} from "./label.entity";
+import { Label } from './label.entity';
 
 @Entity('questions')
 export class Question {
@@ -28,10 +28,14 @@ export class Question {
   question_category_id: number;
 
   @ManyToOne(() => Test, (test) => test.questions)
-  @JoinColumn({name: 'test_id', referencedColumnName: 'id'})
+  @JoinColumn({ name: 'test_id', referencedColumnName: 'id' })
   test: Test;
 
   @ManyToMany(() => Label)
-  @JoinTable({ name: 'question_label', joinColumn: { name: 'question_id' }, inverseJoinColumn: { name: 'label_id' } })
+  @JoinTable({
+    name: 'question_label',
+    joinColumn: { name: 'question_id' },
+    inverseJoinColumn: { name: 'label_id' },
+  })
   labels: Label[];
 }

@@ -5,14 +5,19 @@ import {
   Request,
   UseGuards,
   UseInterceptors,
-  Post, Body, Put, Param, Delete, Query,
+  Post,
+  Body,
+  Put,
+  Param,
+  Delete,
+  Query,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { TestService } from '../test.service';
-import {CreateCategoryDto} from "../validation/CreateCategoryDto";
-import {ApiResponse} from "@nestjs/swagger";
-import {TestCategory} from "../models/test-category.entity";
-import {QueryCategoriesDto} from "../validation/QueryCategoriesDto";
+import { CreateCategoryDto } from '../validation/CreateCategoryDto';
+import { ApiResponse } from '@nestjs/swagger';
+import { TestCategory } from '../models/test-category.entity';
+import { QueryCategoriesDto } from '../validation/QueryCategoriesDto';
 
 @Controller('test-categories')
 export class CategoriesController {
@@ -20,10 +25,7 @@ export class CategoriesController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  async getAll(
-      @Request() req,
-      @Query() query: QueryCategoriesDto
-  ) {
+  async getAll(@Request() req, @Query() query: QueryCategoriesDto) {
     return this.testService.findAllCategories(query);
   }
 
@@ -35,7 +37,10 @@ export class CategoriesController {
 
   @UseGuards(JwtAuthGuard)
   @Put(':id')
-  async update(@Body() categoryData: CreateCategoryDto, @Param('id') id: number) {
+  async update(
+    @Body() categoryData: CreateCategoryDto,
+    @Param('id') id: number,
+  ) {
     return this.testService.updateCategory(id, categoryData);
   }
 

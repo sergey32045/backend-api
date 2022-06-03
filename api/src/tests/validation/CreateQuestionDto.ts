@@ -1,8 +1,7 @@
-import {IsArray, IsInt, IsNotEmpty, MaxLength} from 'class-validator';
-import {ApiProperty} from "@nestjs/swagger";
+import { IsArray, IsInt, IsNotEmpty, MaxLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateQuestionDto {
-
   @ApiProperty({ example: 'What is Javascript?', description: 'Text question' })
   @IsNotEmpty()
   @MaxLength(5000)

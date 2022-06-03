@@ -3,12 +3,16 @@ import {
   Column,
   PrimaryGeneratedColumn,
   OneToOne,
-  OneToMany, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn,
+  OneToMany,
+  ManyToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { TestCategory } from './test-category.entity';
 import { Question } from './question.entity';
-import {Transform} from "class-transformer";
-import {ApiProperty} from "@nestjs/swagger";
+import { Transform } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('tests')
 export class Test {
@@ -32,7 +36,7 @@ export class Test {
   questions: Question[];
 
   @Transform(({ value }) => value.title)
-  @ManyToOne(type => TestCategory)
+  @ManyToOne((type) => TestCategory)
   @JoinColumn({ name: 'test_category_id' })
   category: TestCategory;
 
