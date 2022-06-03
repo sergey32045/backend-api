@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { Test } from './models/test.entity';
-import { FindConditions } from 'typeorm/find-options/FindConditions';
 import { CreateTestDto } from './validation/CreateTestDto';
 import { TestCategory } from './models/test-category.entity';
 import { UpdateTestDto } from './validation/UpdateTestDto';
@@ -14,6 +13,7 @@ import { CreateQuestionDto } from './validation/CreateQuestionDto';
 import { Label } from './models/label.entity';
 import { UpdateQuestionDto } from './validation/UpdateQuestionDto';
 import { GetQuestionsParams } from './validation/GetQuestionsParams';
+import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
 
 @Injectable()
 export class TestService {
@@ -126,7 +126,7 @@ export class TestService {
   }
 
   async findAll(query: QueryTestsDto): Promise<Test[]> {
-    let where: FindConditions<Test> = {};
+    let where: FindOptionsWhere<Test> = {};
 
     const { categoryId, page, limit } = query;
 
@@ -173,9 +173,9 @@ export class TestService {
 
   private async checkTestData(data: CreateTestDto): Promise<void> {
     if (data.test_category_id) {
-      const category = await this.categoryRepository.findOne(
-        data.test_category_id,
-      );
+      const category = await this.categoryRepository.findOne({
+        where: { id: data.test_category_id },
+      });
       if (!category) {
         throw new BadRequestException("Category doesn't exists");
       }
@@ -194,7 +194,7 @@ export class TestService {
   }
 
   async update(id: number, update: UpdateTestDto) {
-    const test = await this.testsRepository.findOne(id);
+    const test = await this.testsRepository.findOne({ where: { id } });
     if (!test) {
       throw new BadRequestException("Test doesn't exists");
     }

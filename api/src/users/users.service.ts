@@ -20,7 +20,7 @@ export class UsersService {
   }
 
   findOne(id: number): Promise<User> {
-    return this.usersRepository.findOne(id);
+    return this.usersRepository.findOne({ where: { id } });
   }
 
   async remove(id: string): Promise<void> {
