@@ -1,4 +1,4 @@
-import { IsArray, IsInt, IsNotEmpty, MaxLength } from 'class-validator';
+import {IsArray, IsBoolean, IsInt, IsNotEmpty, IsOptional, MaxLength} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateQuestionDto {
@@ -8,6 +8,7 @@ export class CreateQuestionDto {
   question: string;
 
   @ApiProperty({ example: [1, 2, 3], description: 'Question labels' })
+  @IsOptional()
   @IsNotEmpty()
   @IsArray()
   labelIds: number[];
@@ -16,4 +17,8 @@ export class CreateQuestionDto {
   @IsNotEmpty()
   @IsInt()
   level: number;
+
+  @ApiProperty({ example: true, description: 'is multiselect question or not' })
+  @IsBoolean()
+  is_multiselect: boolean;
 }

@@ -1,5 +1,5 @@
 import {
-  IsArray,
+  IsArray, IsBoolean,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -22,4 +22,8 @@ export class UpdateQuestionDto {
   @IsInt()
   @IsOptional()
   level: number;
+
+  @ApiProperty({ example: true, description: 'is multiselect question or not' })
+  @IsBoolean()
+  is_multiselect: boolean;
 }

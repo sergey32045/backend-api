@@ -9,15 +9,18 @@ import { CategoriesController } from './controllers/categories.controller';
 import { Label } from './models/label.entity';
 import { QuestionsController } from './controllers/questions.controller';
 import { LabelsController } from './controllers/labels.controller';
+import { Answer } from "./models/answer.entity";
+import { AnswersController } from "./controllers/answers.controller";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Test, Question, TestCategory, Label])],
+  imports: [TypeOrmModule.forFeature([Test, Question, TestCategory, Label, Answer])],
   providers: [TestService],
   controllers: [
     TestController,
     CategoriesController,
     QuestionsController,
     LabelsController,
+    AnswersController,
   ],
   exports: [TestService, TypeOrmModule],
 })

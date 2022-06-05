@@ -5,10 +5,12 @@ import {
   ManyToOne,
   JoinColumn,
   ManyToMany,
-  JoinTable,
+  JoinTable, OneToMany,
 } from 'typeorm';
 import { Test } from './test.entity';
 import { Label } from './label.entity';
+import {ApiProperty} from "@nestjs/swagger";
+import {Answer} from "./answer.entity";
 
 @Entity('questions')
 export class Question {
@@ -24,12 +26,16 @@ export class Question {
   @Column({ type: 'int' })
   level: number;
 
-  @Column({ unsigned: true, nullable: false })
-  question_category_id: number;
+  @ApiProperty({ example: true })
+  @Column({ type: 'boolean', default: false })
+  is_multiselect: boolean
 
   @ManyToOne(() => Test, (test) => test.questions)
   @JoinColumn({ name: 'test_id', referencedColumnName: 'id' })
   test: Test;
+
+  @OneToMany(() => Answer, (answer) => answer.question)
+  answers: Answer[];
 
   @ManyToMany(() => Label)
   @JoinTable({

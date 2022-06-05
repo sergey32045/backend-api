@@ -15,38 +15,39 @@ import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { TestService } from '../test.service';
 import { ApiResponse } from '@nestjs/swagger';
 import { Test } from '../models/test.entity';
-import { Question } from '../models/question.entity';
-import { CreateQuestionDto } from '../validation/CreateQuestionDto';
-import { UpdateQuestionDto } from '../validation/UpdateQuestionDto';
 import { GetQuestionsParams } from '../validation/GetQuestionsParams';
+import {Answer} from "../models/answer.entity";
+import {GetAnswersParams} from "../validation/GetAnswersParams";
+import {CreateAnswerDto} from "../validation/CreateAnswerDto";
+import {UpdateAnswerDto} from "../validation/UpdateAnswerDto";
 
-@Controller('tests/:testid/questions')
-export class QuestionsController {
+@Controller('tests/:testid/questions/:questionid/answers')
+export class AnswersController {
   constructor(private testService: TestService) {}
 
   @ApiResponse({
     status: 200,
-    description: 'Test records',
-    type: [Question],
+    description: 'Answer records',
+    type: [Answer],
   })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  async getAll(@Request() req, @Param() params: GetQuestionsParams) {
-    return this.testService.getQuestions(params);
+  async getAll(@Request() req, @Param() params: GetAnswersParams) {
+    return this.testService.getAnswers(params);
   }
 
   @ApiResponse({
     status: 201,
     description: 'The found record',
-    type: Question,
+    type: Answer,
   })
   @UseGuards(JwtAuthGuard)
   @Post()
   async create(
-    @Body() data: CreateQuestionDto,
-    @Param('testid') testId: number,
+    @Body() data: CreateAnswerDto,
+    @Param() params: GetAnswersParams
   ) {
-    return this.testService.createQuestion(testId, data);
+    return this.testService.createAnswer(params, data);
   }
 
   @ApiResponse({
@@ -56,13 +57,13 @@ export class QuestionsController {
   })
   @UseGuards(JwtAuthGuard)
   @Put(':id')
-  async update(@Body() testData: UpdateQuestionDto, @Param() params: GetQuestionsParams) {
-    return this.testService.updateQuestion(params.id, testData);
+  async update(@Body() data: UpdateAnswerDto, @Param() params: GetAnswersParams) {
+    return this.testService.updateAnswer(params.id, data);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async delete(@Param() params: GetQuestionsParams) {
-    return this.testService.deleteQuestion(params.id);
+  async delete(@Param() params: GetAnswersParams) {
+    return this.testService.deleteAnswer(params.id);
   }
 }

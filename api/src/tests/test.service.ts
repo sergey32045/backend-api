@@ -1,19 +1,25 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, Repository } from 'typeorm';
+import {In, Not, Repository} from 'typeorm';
 import { Test } from './models/test.entity';
-import { CreateTestDto } from './validation/CreateTestDto';
+import {
+  CreateTestDto,
+  UpdateTestDto,
+  CreateCategoryDto,
+  QueryCategoriesDto,
+  QueryTestsDto,
+  CreateQuestionDto,
+  UpdateQuestionDto,
+  GetQuestionsParams,
+  GetAnswersParams,
+  CreateAnswerDto,
+  UpdateAnswerDto,
+} from './validation';
 import { TestCategory } from './models/test-category.entity';
-import { UpdateTestDto } from './validation/UpdateTestDto';
-import { CreateCategoryDto } from './validation/CreateCategoryDto';
-import { QueryCategoriesDto } from './validation/QueryCategoriesDto';
-import { QueryTestsDto } from './validation/QueryTestsDto';
 import { Question } from './models/question.entity';
-import { CreateQuestionDto } from './validation/CreateQuestionDto';
 import { Label } from './models/label.entity';
-import { UpdateQuestionDto } from './validation/UpdateQuestionDto';
-import { GetQuestionsParams } from './validation/GetQuestionsParams';
 import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
+import {Answer} from "./models/answer.entity";
 
 @Injectable()
 export class TestService {
@@ -26,7 +32,42 @@ export class TestService {
     private questionRepository: Repository<Question>,
     @InjectRepository(Label)
     private labelRepository: Repository<Label>,
+    @InjectRepository(Answer)
+    private answerRepository: Repository<Answer>,
   ) {}
+
+  async getAnswers(params: GetAnswersParams): Promise<Answer[]> {
+    return this.answerRepository.find({
+      where: {
+        question_id: params.questionid,
+      }
+    });
+  }
+
+  async createAnswer(params: GetAnswersParams, data: CreateAnswerDto) {
+    const answer = new Answer();
+    answer.question_id = params.questionid;
+    answer.answer = data.answer;
+    answer.is_correct = data.isCorrect;
+
+    return this.answerRepository.save(answer);
+  }
+
+  async updateAnswer(id: number, data: UpdateAnswerDto) {
+    const answer = await this.answerRepository.findOne({ where: { id } });
+    if (!answer) {
+      throw new BadRequestException("Answer doesn't exists");
+    }
+
+    answer.answer = data.answer;
+    answer.is_correct = data.isCorrect;
+
+    return this.answerRepository.save(answer);
+  }
+
+  async deleteAnswer(id: number) {
+    return this.answerRepository.delete(id);
+  }
 
   async getQuestions(params: GetQuestionsParams): Promise<Question[]> {
     return this.questionRepository.find({
@@ -45,10 +86,10 @@ export class TestService {
 
     question.question = data.question;
     question.level = data.level;
+    question.is_multiselect = data.is_multiselect;
 
     if (data.labelIds) {
-      const labels = await this.labelRepository.findByIds(data.labelIds);
-      console.log(labels, 'labels');
+      const labels = await this.labelRepository.find({ where: { id: In(data.labelIds) } });
       question.labels = labels;
     }
 
@@ -64,9 +105,10 @@ export class TestService {
     question.question = data.question;
     question.level = data.level;
     question.test_id = testId;
+    question.is_multiselect = data.is_multiselect;
 
     if (data.labelIds) {
-      const labels = await this.labelRepository.findByIds(data.labelIds);
+      const labels = await this.labelRepository.find({ where: { id: In(data.labelIds) } });
       question.labels = labels;
     }
 

@@ -7,7 +7,6 @@ export class Questions1652879985864 implements MigrationInterface {
             CREATE TABLE IF NOT EXISTS questions (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 test_id INT UNSIGNED NOT NULL,
-                question_category_id INT UNSIGNED NOT NULL,
                 level TINYINT UNSIGNED,
                 question TEXT NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
