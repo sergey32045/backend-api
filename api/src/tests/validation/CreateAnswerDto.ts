@@ -1,8 +1,11 @@
-import { IsBoolean, IsNotEmpty, MaxLength} from 'class-validator';
+import { IsBoolean, IsNotEmpty, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateAnswerDto {
-  @ApiProperty({ example: 'Javascript is programming language', description: 'Text answer' })
+  @ApiProperty({
+    example: 'Javascript is programming language',
+    description: 'Text answer',
+  })
   @IsNotEmpty()
   @MaxLength(5000)
   answer: string;

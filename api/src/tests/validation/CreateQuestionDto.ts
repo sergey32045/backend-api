@@ -1,4 +1,11 @@
-import {IsArray, IsBoolean, IsInt, IsNotEmpty, IsOptional, MaxLength} from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  MaxLength,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateQuestionDto {

@@ -5,8 +5,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import {ApiProperty} from "@nestjs/swagger";
-import {Question} from "./question.entity";
+import { ApiProperty } from '@nestjs/swagger';
+import { Question } from './question.entity';
 
 @Entity('answers')
 export class Answer {
@@ -21,7 +21,7 @@ export class Answer {
 
   @ApiProperty({ example: true })
   @Column({ type: 'boolean', default: false })
-  is_correct: boolean
+  is_correct: boolean;
 
   @ManyToOne(() => Question, (question) => question.answers)
   @JoinColumn({ name: 'question_id', referencedColumnName: 'id' })

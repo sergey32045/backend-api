@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {In, Not, Repository} from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { Test } from './models/test.entity';
 import {
   CreateTestDto,
@@ -19,7 +19,7 @@ import { TestCategory } from './models/test-category.entity';
 import { Question } from './models/question.entity';
 import { Label } from './models/label.entity';
 import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
-import {Answer} from "./models/answer.entity";
+import { Answer } from './models/answer.entity';
 
 @Injectable()
 export class TestService {
@@ -40,7 +40,7 @@ export class TestService {
     return this.answerRepository.find({
       where: {
         question_id: params.questionid,
-      }
+      },
     });
   }
 
@@ -89,7 +89,9 @@ export class TestService {
     question.is_multiselect = data.is_multiselect;
 
     if (data.labelIds) {
-      const labels = await this.labelRepository.find({ where: { id: In(data.labelIds) } });
+      const labels = await this.labelRepository.find({
+        where: { id: In(data.labelIds) },
+      });
       question.labels = labels;
     }
 
@@ -108,7 +110,9 @@ export class TestService {
     question.is_multiselect = data.is_multiselect;
 
     if (data.labelIds) {
-      const labels = await this.labelRepository.find({ where: { id: In(data.labelIds) } });
+      const labels = await this.labelRepository.find({
+        where: { id: In(data.labelIds) },
+      });
       question.labels = labels;
     }
 

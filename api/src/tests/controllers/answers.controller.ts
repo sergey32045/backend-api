@@ -15,11 +15,10 @@ import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { TestService } from '../test.service';
 import { ApiResponse } from '@nestjs/swagger';
 import { Test } from '../models/test.entity';
-import { GetQuestionsParams } from '../validation/GetQuestionsParams';
-import {Answer} from "../models/answer.entity";
-import {GetAnswersParams} from "../validation/GetAnswersParams";
-import {CreateAnswerDto} from "../validation/CreateAnswerDto";
-import {UpdateAnswerDto} from "../validation/UpdateAnswerDto";
+import { Answer } from '../models/answer.entity';
+import { GetAnswersParams } from '../validation/GetAnswersParams';
+import { CreateAnswerDto } from '../validation/CreateAnswerDto';
+import { UpdateAnswerDto } from '../validation/UpdateAnswerDto';
 
 @Controller('tests/:testid/questions/:questionid/answers')
 export class AnswersController {
@@ -45,7 +44,7 @@ export class AnswersController {
   @Post()
   async create(
     @Body() data: CreateAnswerDto,
-    @Param() params: GetAnswersParams
+    @Param() params: GetAnswersParams,
   ) {
     return this.testService.createAnswer(params, data);
   }
@@ -57,7 +56,10 @@ export class AnswersController {
   })
   @UseGuards(JwtAuthGuard)
   @Put(':id')
-  async update(@Body() data: UpdateAnswerDto, @Param() params: GetAnswersParams) {
+  async update(
+    @Body() data: UpdateAnswerDto,
+    @Param() params: GetAnswersParams,
+  ) {
     return this.testService.updateAnswer(params.id, data);
   }
 

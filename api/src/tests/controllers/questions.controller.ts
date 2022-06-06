@@ -56,7 +56,10 @@ export class QuestionsController {
   })
   @UseGuards(JwtAuthGuard)
   @Put(':id')
-  async update(@Body() testData: UpdateQuestionDto, @Param() params: GetQuestionsParams) {
+  async update(
+    @Body() testData: UpdateQuestionDto,
+    @Param() params: GetQuestionsParams,
+  ) {
     return this.testService.updateQuestion(params.id, testData);
   }
 

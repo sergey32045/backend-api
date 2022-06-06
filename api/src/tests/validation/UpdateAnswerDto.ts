@@ -1,8 +1,11 @@
-import { IsBoolean, IsOptional, MaxLength} from 'class-validator';
+import { IsBoolean, IsOptional, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateAnswerDto {
-  @ApiProperty({ example: 'Javascript is programming language', description: 'Text answer' })
+  @ApiProperty({
+    example: 'Javascript is programming language',
+    description: 'Text answer',
+  })
   @IsOptional()
   @MaxLength(5000)
   answer: string;

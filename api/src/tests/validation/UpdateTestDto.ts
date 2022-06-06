@@ -1,5 +1,5 @@
-import {IsBoolean, IsInt, MaxLength} from 'class-validator';
-import {ApiProperty} from "@nestjs/swagger";
+import { IsBoolean, IsInt, MaxLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateTestDto {
   @ApiProperty({ example: 1, description: 'Test category' })
