@@ -4,6 +4,7 @@
             "name": "interview-API",
             "image": "861579771046.dkr.ecr.eu-central-1.amazonaws.com/interviewboom:master",
             "cpu": 0,
+            "memoryReservation": 500,
             "portMappings": [
                 {
                     "containerPort": 3000,
@@ -38,5 +39,5 @@
         "EC2"
     ],
     "cpu": "1024",
-    "memory": "1024"
+    "memory": "800"
 }
