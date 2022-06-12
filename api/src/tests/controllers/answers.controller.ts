@@ -16,9 +16,11 @@ import { TestService } from '../test.service';
 import { ApiResponse } from '@nestjs/swagger';
 import { Test } from '../models/test.entity';
 import { Answer } from '../models/answer.entity';
-import { GetAnswersParams } from '../validation/GetAnswersParams';
-import { CreateAnswerDto } from '../validation/CreateAnswerDto';
-import { UpdateAnswerDto } from '../validation/UpdateAnswerDto';
+import {
+  CreateAnswerDto,
+  GetAnswersParams,
+  UpdateAnswerDto,
+} from '../validation';
 
 @Controller('tests/:testid/questions/:questionid/answers')
 export class AnswersController {

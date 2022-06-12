@@ -7,9 +7,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from './config/configuration';
 import { AuthModule } from './auth/auth.module';
 import { TestsModule } from './tests/tests.module';
+import { SessionsModule } from './test-session/sessions.module';
 
 @Module({
   imports: [
+    SessionsModule,
     TestsModule,
     ConfigModule.forRoot({
       envFilePath: `src/config/env/.${process.env.NODE_ENV}.env`,
