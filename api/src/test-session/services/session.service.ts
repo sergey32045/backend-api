@@ -9,7 +9,7 @@ import {
 import { SaveSessionAnswerDto } from '../../tests/validation';
 import { Answer } from '../../tests/models/answer.entity';
 import { Question } from '../../tests/models/question.entity';
-import {StartSessionDto} from "../../tests/validation/StartSessionDto";
+import { StartSessionDto } from '../../tests/validation/StartSessionDto';
 
 export class SessionService {
   constructor(

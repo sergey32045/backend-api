@@ -22,10 +22,7 @@ export class TestSessionController {
   })
   @UseInterceptors(ClassSerializerInterceptor)
   @Post()
-  async startSession(
-      @Request() req,
-      @Body() data: StartSessionDto,
-  ) {
+  async startSession(@Request() req, @Body() data: StartSessionDto) {
     return this.sessionService.startSession(data);
   }
 
