@@ -18,6 +18,8 @@ import { CreateCategoryDto } from '../validation/CreateCategoryDto';
 import { ApiResponse } from '@nestjs/swagger';
 import { TestCategory } from '../models/test-category.entity';
 import { QueryCategoriesDto } from '../validation/QueryCategoriesDto';
+import { Roles } from '../../auth/rbac/roles.decorator';
+import { Role } from '../../auth/rbac/role.enum';
 
 @Controller('test-categories')
 export class CategoriesController {
@@ -29,13 +31,13 @@ export class CategoriesController {
     return this.testService.findAllCategories(query);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
   @Post()
   async create(@Body() categoryData: CreateCategoryDto) {
     return this.testService.createCategory(categoryData);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
   @Put(':id')
   async update(
     @Body() categoryData: CreateCategoryDto,
@@ -55,7 +57,7 @@ export class CategoriesController {
     return this.testService.findOneCategory(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
   @Delete(':id')
   async delete(@Param('id') id: number) {
     return this.testService.deleteCategory(id);

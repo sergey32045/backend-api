@@ -11,12 +11,20 @@ import { QuestionsController } from './controllers/questions.controller';
 import { LabelsController } from './controllers/labels.controller';
 import { Answer } from './models/answer.entity';
 import { AnswersController } from './controllers/answers.controller';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Test, Question, TestCategory, Label, Answer]),
   ],
-  providers: [TestService],
+  providers: [
+    TestService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
   controllers: [
     TestController,
     CategoriesController,

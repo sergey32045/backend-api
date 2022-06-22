@@ -36,16 +36,16 @@ export class Session {
   @ManyToMany(() => Question)
   @JoinTable({
     name: 'session_question',
-    joinColumn: { name: 'question_id' },
-    inverseJoinColumn: { name: 'session_id' },
+    joinColumn: { name: 'session_id' },
+    inverseJoinColumn: { name: 'question_id' },
   })
   questions: Question[];
 
   @ManyToMany(() => Answer)
   @JoinTable({
     name: 'session_answer',
-    joinColumn: { name: 'answer_id' },
-    inverseJoinColumn: { name: 'session_id' },
+    joinColumn: { name: 'session_id' },
+    inverseJoinColumn: { name: 'answer_id' },
   })
   answers: Answer[];
 

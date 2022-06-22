@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
+import { Role } from '../../auth/rbac/role.enum';
 
 @Entity('users')
 export class User {
@@ -31,6 +32,9 @@ export class User {
 
   @CreateDateColumn()
   created_at: Date;
+
+  @Column({ type: 'json', name: 'roles' })
+  roles: Role[];
 
   @BeforeInsert()
   async setPassword(password: string) {

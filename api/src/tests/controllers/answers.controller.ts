@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Request,
-  UseGuards,
   UseInterceptors,
   Post,
   Body,
@@ -21,6 +20,8 @@ import {
   GetAnswersParams,
   UpdateAnswerDto,
 } from '../validation';
+import { Roles } from '../../auth/rbac/roles.decorator';
+import { Role } from '../../auth/rbac/role.enum';
 
 @Controller('tests/:testid/questions/:questionid/answers')
 export class AnswersController {
@@ -42,7 +43,7 @@ export class AnswersController {
     description: 'The found record',
     type: Answer,
   })
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
   @Post()
   async create(
     @Body() data: CreateAnswerDto,
@@ -56,7 +57,7 @@ export class AnswersController {
     description: 'The found record',
     type: Test,
   })
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
   @Put(':id')
   async update(
     @Body() data: UpdateAnswerDto,
@@ -65,7 +66,7 @@ export class AnswersController {
     return this.testService.updateAnswer(params.id, data);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
   @Delete(':id')
   async delete(@Param() params: GetAnswersParams) {
     return this.testService.deleteAnswer(params.id);

@@ -10,15 +10,15 @@ import {
   Body,
   Put,
   Param,
-  Delete,
+  Req,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { TestService } from '../test.service';
-import { CreateTestDto } from '../validation/CreateTestDto';
-import { UpdateTestDto } from '../validation/UpdateTestDto';
-import { QueryTestsDto } from '../validation/QueryTestsDto';
+import { CreateTestDto, UpdateTestDto, QueryTestsDto } from '../validation';
 import { ApiResponse } from '@nestjs/swagger';
 import { Test } from '../models/test.entity';
+import { Role } from '../../auth/rbac/role.enum';
+import { Roles } from '../../auth/rbac/roles.decorator';
 
 @Controller('tests')
 export class TestController {
@@ -40,9 +40,10 @@ export class TestController {
     description: 'The found record',
     type: Test,
   })
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
   @Post()
-  async create(@Body() testData: CreateTestDto) {
+  async create(@Req() req, @Body() testData: CreateTestDto) {
+    console.log(req.user, 'req.user');
     return this.testService.create(testData);
   }
 
@@ -51,14 +52,14 @@ export class TestController {
     description: 'The found record',
     type: Test,
   })
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
   @Put(':id')
   async update(@Body() testData: UpdateTestDto, @Param('id') id: number) {
     return this.testService.update(id, testData);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Delete(':id')
+  @Roles(Role.Admin)
   async delete(@Param('id') id: number) {
     return this.testService.delete(id);
   }
@@ -68,7 +69,6 @@ export class TestController {
     description: 'The found record',
     type: Test,
   })
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async get(@Param('id') id: number) {
     return this.testService.findOne(id);

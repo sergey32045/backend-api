@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './models/user.entity';
 import { RegisterUserDto } from '../auth/validation/RegisterUserDto';
+import { Role } from '../auth/rbac/role.enum';
 
 @Injectable()
 export class UsersService {
@@ -32,6 +33,7 @@ export class UsersService {
     user.password = userData.password;
     user.fullName = userData.fullName;
     user.email = userData.email;
+    user.roles = [Role.User];
     if (user.email) {
       const existingUser = await this.findOneByEmail(user.email);
       if (existingUser) {

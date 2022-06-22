@@ -16,8 +16,10 @@ export class AuthService {
     const isMatch = user ? await bcrypt.compare(pass, user.password) : false;
     if (isMatch) {
       const { password, ...result } = user;
+      console.log(result, 'result ....');
       return result;
     }
+    console.log('dfdfdfd');
     return null;
   }
 
@@ -31,7 +33,8 @@ export class AuthService {
   }
 
   async login(user: User) {
-    const payload = { username: user.email, sub: user.id };
+    console.log(user, 'user KKKK');
+    const payload = { username: user.email, sub: user.id, roles: user.roles };
     return {
       accessToken: this.jwtService.sign(payload),
     };

@@ -6,10 +6,10 @@ import {
   SessionAnswer,
   SessionQuestion,
 } from '../models/session.entity';
-import { SaveSessionAnswerDto } from '../../tests/validation';
+import { SaveSessionAnswerDto, StartSessionDto } from '../validation';
 import { Answer } from '../../tests/models/answer.entity';
 import { Question } from '../../tests/models/question.entity';
-import { StartSessionDto } from '../../tests/validation/StartSessionDto';
+import { BadRequestException } from '@nestjs/common';
 
 export class SessionService {
   constructor(
@@ -36,11 +36,19 @@ export class SessionService {
       const session = new Session();
       session.status = 'started';
       session.test_id = 1;
-      await this.sessionRepository.save(session);
+      return this.sessionRepository.save(session);
     }
+    throw new BadRequestException('test not found');
   }
 
-  async getSessions(sessionId: string) {}
+  async getSession(sessionId: string) {
+    const sessionRecord = await this.sessionRepository.findOne({
+      where: { id: sessionId },
+      relations: ['questions.answers', 'answers'],
+    });
+
+    return sessionRecord;
+  }
 
   async saveAnswer(sessionId: string, data: SaveSessionAnswerDto) {
     const sessionRecord = await this.sessionRepository.findOne({
@@ -48,10 +56,10 @@ export class SessionService {
     });
 
     if (sessionRecord) {
-      if (data.answers) {
+      if (data.answerIds) {
         const answers = await this.answerRepository.find({
           where: {
-            id: In(data.answers.map((answer) => answer.id)),
+            id: In(data.answerIds),
             question_id: data.questionId,
           },
         });
@@ -59,10 +67,8 @@ export class SessionService {
         for (const answer of answers) {
           const sessionAnswer = new SessionAnswer();
 
-          const isAnswerCorrect = data.answers.find(
-            (answerDto) =>
-              answer.id == answerDto.id &&
-              answer.is_correct === answerDto.is_correct,
+          const isAnswerCorrect = data.answerIds.find(
+            (answerId) => answer.id == answerId && answer.is_correct,
           );
           sessionAnswer.session_id = sessionId;
           sessionAnswer.answer_id = answer.id;

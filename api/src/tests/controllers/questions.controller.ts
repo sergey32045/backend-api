@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Request,
-  UseGuards,
   UseInterceptors,
   Post,
   Body,
@@ -11,14 +10,17 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { TestService } from '../test.service';
 import { ApiResponse } from '@nestjs/swagger';
 import { Test } from '../models/test.entity';
 import { Question } from '../models/question.entity';
-import { CreateQuestionDto } from '../validation/CreateQuestionDto';
-import { UpdateQuestionDto } from '../validation/UpdateQuestionDto';
-import { GetQuestionsParams } from '../validation/GetQuestionsParams';
+import {
+  CreateQuestionDto,
+  UpdateQuestionDto,
+  GetQuestionsParams,
+} from '../validation';
+import { Roles } from '../../auth/rbac/roles.decorator';
+import { Role } from '../../auth/rbac/role.enum';
 
 @Controller('tests/:testid/questions')
 export class QuestionsController {
@@ -26,7 +28,7 @@ export class QuestionsController {
 
   @ApiResponse({
     status: 200,
-    description: 'Test records',
+    description: 'Question records',
     type: [Question],
   })
   @UseInterceptors(ClassSerializerInterceptor)
@@ -40,7 +42,7 @@ export class QuestionsController {
     description: 'The found record',
     type: Question,
   })
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
   @Post()
   async create(
     @Body() data: CreateQuestionDto,
@@ -54,7 +56,7 @@ export class QuestionsController {
     description: 'The found record',
     type: Test,
   })
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
   @Put(':id')
   async update(
     @Body() testData: UpdateQuestionDto,
@@ -63,7 +65,7 @@ export class QuestionsController {
     return this.testService.updateQuestion(params.id, testData);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Roles(Role.Admin)
   @Delete(':id')
   async delete(@Param() params: GetQuestionsParams) {
     return this.testService.deleteQuestion(params.id);
