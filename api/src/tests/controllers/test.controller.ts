@@ -43,7 +43,6 @@ export class TestController {
   @Roles(Role.Admin)
   @Post()
   async create(@Req() req, @Body() testData: CreateTestDto) {
-    console.log(req.user, 'req.user');
     return this.testService.create(testData);
   }
 

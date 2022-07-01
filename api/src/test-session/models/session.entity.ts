@@ -16,6 +16,7 @@ import { Answer } from '../../tests/models/answer.entity';
 
 @Entity('test_sessions')
 export class Session {
+  @ApiProperty({ example: 1 })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

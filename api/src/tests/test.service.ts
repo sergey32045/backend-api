@@ -45,6 +45,13 @@ export class TestService {
   }
 
   async createAnswer(params: GetAnswersParams, data: CreateAnswerDto) {
+    const question = this.questionRepository.findOne({
+      where: { id: params.questionid },
+    });
+    if (!question) {
+      throw new BadRequestException("Question doesn't exists");
+    }
+
     const answer = new Answer();
     answer.question_id = params.questionid;
     answer.answer = data.answer;
@@ -79,7 +86,13 @@ export class TestService {
   }
 
   async updateQuestion(id: number, data: UpdateQuestionDto) {
-    const question = await this.questionRepository.findOne({ where: { id } });
+    // const question = await this.questionRepository.findOne({ where: { id }, relations: [ "answers" ] });
+    const question = await this.questionRepository
+      .createQueryBuilder('questions')
+      .innerJoinAndSelect('questions.answers', 'answers')
+      .where('answers.is_correct = :isCorrect', { isCorrect: true })
+      .where('questions.id = :id', { id })
+      .getOne();
     if (!question) {
       throw new BadRequestException("Question doesn't exists");
     }
@@ -87,6 +100,10 @@ export class TestService {
     question.question = data.question;
     question.level = data.level;
     question.is_multiselect = data.is_multiselect;
+
+    if (!data.is_multiselect && question.answers.length > 1) {
+      throw new BadRequestException('Question has more than one answer');
+    }
 
     if (data.labelIds) {
       const labels = await this.labelRepository.find({
