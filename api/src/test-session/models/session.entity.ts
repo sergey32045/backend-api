@@ -9,6 +9,7 @@ import {
   OneToMany,
   ManyToOne,
   JoinColumn,
+  PrimaryColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Question } from '../../tests/models/question.entity';
@@ -70,13 +71,14 @@ export class Session {
 
 @Entity('session_question')
 export class SessionQuestion {
-  @PrimaryGeneratedColumn({ unsigned: true })
+  @PrimaryColumn({ unsigned: true, type: 'int' })
   question_id: number;
 
   @Column({ type: 'boolean', default: false })
   is_answered: boolean;
 
   @Column({ type: 'varchar', length: 36, nullable: false })
+  @PrimaryColumn()
   session_id: string;
 
   @ManyToOne(() => Session, (session) => session.sessionQuestions)
@@ -86,13 +88,14 @@ export class SessionQuestion {
 
 @Entity('session_answer')
 export class SessionAnswer {
-  @PrimaryGeneratedColumn({ unsigned: true })
+  @PrimaryColumn({ unsigned: true, type: 'int' })
   answer_id: number;
 
   @Column({ type: 'boolean', default: false })
   is_correct: boolean;
 
   @Column({ type: 'varchar', length: 36, nullable: false })
+  @PrimaryColumn()
   session_id: string;
 
   @ManyToOne(() => Session, (session) => session.sessionAnswers)

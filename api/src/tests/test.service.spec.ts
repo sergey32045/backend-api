@@ -45,7 +45,9 @@ describe('test.service', () => {
 
     repositoryMock.find.mockResolvedValue(tests);
 
-    expect(await service.findAll(categoryId)).toEqual(tests);
+    expect(await service.findAll({ categoryId: categoryId } as any)).toEqual(
+      tests,
+    );
     // And make assertions on how often and with what params your mock's methods are called
     expect(repositoryMock.find).toHaveBeenCalledWith(
       expect.objectContaining({ where: { test_category_id: categoryId } }),

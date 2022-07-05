@@ -65,38 +65,50 @@ export class SessionService {
       where: { id: sessionId },
     });
 
-    if (sessionRecord) {
-      if (!data.answerIds) {
-        return;
-      }
-
-      const answers = await this.answerRepository.find({
-        where: {
-          id: In(data.answerIds),
-          question_id: In([data.questionId]),
-        },
-      });
-      const savedAnswers = await this.saveAnswers(sessionId, answers, data);
-
-      if (data.questionId) {
-        const questions = await this.questionRepository.find({
-          where: { id: In([data.questionId]) },
-        });
-        const sessionQuestions: SessionQuestion[] = [];
-        for (const question of questions) {
-          const sessionQuestion = new SessionQuestion();
-          sessionQuestion.session_id = sessionId;
-          sessionQuestion.question_id = question.id;
-          sessionQuestion.is_answered = this.isAnsweredQuestion(
-            savedAnswers,
-            question,
-            answers,
-          );
-          sessionQuestions.push(sessionQuestion);
-        }
-        await this.sessionQuestionRepository.save(sessionQuestions);
-      }
+    if (!sessionRecord) {
+      throw new BadRequestException('session not found!');
     }
+
+    if (!data.answerIds) {
+      return;
+    }
+
+    const answers = await this.answerRepository
+      .createQueryBuilder('answers')
+      .andWhereInIds(data.answerIds)
+      .innerJoin('answers.question', 'question')
+      .andWhere('question.test_id = :testId', { testId: sessionRecord.test_id })
+      .andWhere('answers.question_id IN(:...questionId)', {
+        questionId: [data.questionId],
+      })
+      .getMany();
+
+    if (answers.length < 1) {
+      return;
+    }
+
+    const savedAnswers = await this.saveAnswers(sessionId, answers, data);
+
+    if (data.questionId) {
+      const questions = await this.questionRepository.find({
+        where: { id: In([data.questionId]), test_id: sessionRecord.test_id },
+      });
+      const sessionQuestions: SessionQuestion[] = [];
+      for (const question of questions) {
+        const sessionQuestion = new SessionQuestion();
+        sessionQuestion.session_id = sessionId;
+        sessionQuestion.question_id = question.id;
+        sessionQuestion.is_answered = this.isAnsweredQuestion(
+          savedAnswers,
+          question,
+          answers,
+        );
+        sessionQuestions.push(sessionQuestion);
+      }
+
+      await this.sessionQuestionRepository.save(sessionQuestions);
+    }
+
     return this.sessionRepository.save(sessionRecord);
   }
 
@@ -104,7 +116,7 @@ export class SessionService {
     savedAnswers: SessionAnswer[],
     question: Question,
     answers: Answer[],
-  ) {
+  ): boolean {
     if (!savedAnswers) return;
 
     const sessionCorrectAnswers = savedAnswers.filter((savedAnswer) =>
@@ -116,7 +128,7 @@ export class SessionService {
       ),
     );
     if (sessionCorrectAnswers.length < 1) {
-      return;
+      return false;
     }
 
     if (question.is_multiselect) {
@@ -158,6 +170,18 @@ export class SessionService {
     data: SaveSessionAnswerDto,
   ) {
     const sessionAnswers: SessionAnswer[] = [];
+    const questionIds = answers.flatMap((answer) => answer.question_id);
+    // filter answers if they are already exist
+    const existingSessionQuestions =
+      await this.sessionQuestionRepository.countBy({
+        question_id: In(questionIds),
+        session_id: sessionId,
+      });
+    if (existingSessionQuestions > 0) {
+      throw new BadRequestException(
+        'Question is already answered for this session!',
+      );
+    }
     for (const answer of answers) {
       const sessionAnswer = new SessionAnswer();
 
