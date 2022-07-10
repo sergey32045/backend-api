@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Test } from '../../tests/models/test.entity';
-import { In, Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import {
   Session,
   SessionAnswer,
@@ -39,6 +39,28 @@ export class SessionService {
       return this.sessionRepository.save(session);
     }
     throw new BadRequestException('test not found');
+  }
+
+  async getNextQuestion(sessionId: string): Promise<Question> {
+    const sessionRecord = await this.sessionRepository.findOne({
+      where: {
+        id: sessionId,
+      },
+    });
+    const sessionQuestions = await this.sessionQuestionRepository.findBy({
+      session_id: sessionId,
+    });
+
+    return await this.questionRepository.findOneBy({
+      id: Not(
+        In(
+          sessionQuestions.flatMap(
+            (sessionQuestion) => sessionQuestion.question_id,
+          ),
+        ),
+      ),
+      test_id: sessionRecord.test_id,
+    });
   }
 
   async getSession(sessionId: string) {

@@ -101,7 +101,10 @@ export class TestService {
     question.level = data.level;
     question.is_multiselect = data.is_multiselect;
 
-    if (!data.is_multiselect && question.answers.length > 1) {
+    if (
+      !data.is_multiselect &&
+      question.answers?.filter((answer) => answer.is_correct).length > 1
+    ) {
       throw new BadRequestException('Question has more than one answer');
     }
 

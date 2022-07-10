@@ -25,4 +25,11 @@ export class LikeCounterService {
       },
     });
   }
+  getLikes(data: LikeQueryDto): Promise<Like[]> {
+    return this.likeRepository.find({
+      where: { source_type: data.source },
+      order: { id: 'DESC' },
+      take: 30,
+    });
+  }
 }
