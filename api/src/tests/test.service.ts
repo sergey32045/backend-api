@@ -100,6 +100,7 @@ export class TestService {
     question.question = data.question;
     question.level = data.level;
     question.is_multiselect = data.is_multiselect;
+    question.title = data.title;
 
     if (
       !data.is_multiselect &&
@@ -127,6 +128,7 @@ export class TestService {
     question.question = data.question;
     question.level = data.level;
     question.test_id = testId;
+    question.title = data.title;
     question.is_multiselect = data.is_multiselect;
 
     if (data.labelIds) {
@@ -160,6 +162,7 @@ export class TestService {
     category.title = categoryData.title;
     category.name = categoryData.name;
     category.parent_id = categoryData.parent_id;
+    category.description = categoryData.description;
 
     await this.checkCategoryData(categoryData);
 
@@ -181,6 +184,7 @@ export class TestService {
     category.title = categoryData.title;
     category.name = categoryData.name;
     category.parent_id = categoryData.parent_id;
+    category.description = categoryData.description;
 
     await this.checkCategoryData(categoryData, id);
 

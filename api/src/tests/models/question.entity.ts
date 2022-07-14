@@ -12,6 +12,7 @@ import { Test } from './test.entity';
 import { Label } from './label.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Answer } from './answer.entity';
+import { SessionQuestion } from '../../test-session/models/session.entity';
 
 @Entity('questions')
 export class Question {
@@ -21,9 +22,15 @@ export class Question {
   @Column({ unsigned: true, nullable: false })
   test_id: number;
 
+  @ApiProperty({ example: ' Question text' })
   @Column({ type: 'text', nullable: false })
   question: string;
 
+  @ApiProperty({ example: 'Title question' })
+  @Column({ type: 'text', nullable: false })
+  title: string;
+
+  @ApiProperty({ example: 1 })
   @Column({ type: 'int' })
   level: number;
 
@@ -45,4 +52,11 @@ export class Question {
     inverseJoinColumn: { name: 'label_id' },
   })
   labels: Label[];
+
+  @OneToMany(
+    () => SessionQuestion,
+    (sessionQuestion) => sessionQuestion.question,
+  )
+  @JoinColumn({ name: 'id', referencedColumnName: 'question_id' })
+  public sessionQuestions: SessionQuestion[];
 }

@@ -14,6 +14,14 @@ export class CreateQuestionDto {
   @MaxLength(5000)
   question: string;
 
+  @ApiProperty({
+    example: 'Title: What is Javascript?',
+    description: 'Title question',
+  })
+  @IsNotEmpty()
+  @MaxLength(1000)
+  title: string;
+
   @ApiProperty({ example: [1, 2, 3], description: 'Question labels' })
   @IsOptional()
   @IsNotEmpty()

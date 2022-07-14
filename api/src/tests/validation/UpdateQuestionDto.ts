@@ -14,6 +14,14 @@ export class UpdateQuestionDto {
   @IsOptional()
   question: string;
 
+  @ApiProperty({
+    example: 'Title: What is Javascript?',
+    description: 'Title question',
+  })
+  @IsOptional()
+  @MaxLength(1000)
+  title: string;
+
   @ApiProperty({ example: [1, 2, 3], description: 'Question labels' })
   @IsArray()
   @IsOptional()

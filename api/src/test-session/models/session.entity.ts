@@ -14,6 +14,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Question } from '../../tests/models/question.entity';
 import { Answer } from '../../tests/models/answer.entity';
+import { Transform } from 'class-transformer';
 
 @Entity('test_sessions')
 export class Session {
@@ -51,6 +52,14 @@ export class Session {
   })
   answers: Answer[];
 
+  @Transform(({ value }) => {
+    return value.map((sessionQuestion) => {
+      if (sessionQuestion?.question?.title) {
+        sessionQuestion.question = sessionQuestion.question.title;
+      }
+      return sessionQuestion;
+    });
+  })
   @OneToMany(
     () => SessionQuestion,
     (sessionQuestion) => sessionQuestion.session,
@@ -84,6 +93,10 @@ export class SessionQuestion {
   @ManyToOne(() => Session, (session) => session.sessionQuestions)
   @JoinColumn({ name: 'session_id', referencedColumnName: 'id' })
   public session: Session;
+
+  @ManyToOne(() => Question, (question) => question.sessionQuestions)
+  @JoinColumn({ name: 'question_id', referencedColumnName: 'id' })
+  public question: Question;
 }
 
 @Entity('session_answer')

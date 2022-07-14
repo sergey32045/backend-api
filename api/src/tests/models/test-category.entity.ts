@@ -21,6 +21,10 @@ export class TestCategory {
   @Column({ type: 'varchar', nullable: false })
   name: string;
 
+  @ApiProperty({ example: 'Description of the category' })
+  @Column({ type: 'text', nullable: true })
+  description: string;
+
   @ApiProperty({ example: 'Javascript', description: 'Title of a category' })
   @Column({ type: 'tinytext', nullable: false })
   title: string;

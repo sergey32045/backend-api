@@ -41,7 +41,7 @@ export class SessionService {
     throw new BadRequestException('test not found');
   }
 
-  async getNextQuestion(sessionId: string): Promise<Question> {
+  async getNextQuestion(sessionId: string): Promise<any> {
     const sessionRecord = await this.sessionRepository.findOne({
       where: {
         id: sessionId,
@@ -51,7 +51,7 @@ export class SessionService {
       session_id: sessionId,
     });
 
-    return await this.questionRepository.findOneBy({
+    const question = await this.questionRepository.findOneBy({
       id: Not(
         In(
           sessionQuestions.flatMap(
@@ -61,6 +61,25 @@ export class SessionService {
       ),
       test_id: sessionRecord.test_id,
     });
+
+    const countAnsweredQuestions = await this.questionRepository.countBy({
+      id: In(
+        sessionQuestions.flatMap(
+          (sessionQuestion) => sessionQuestion.question_id,
+        ),
+      ),
+      test_id: sessionRecord.test_id,
+    });
+
+    const generalCountQuestions = await this.questionRepository.countBy({
+      test_id: sessionRecord.test_id,
+    });
+
+    return {
+      question,
+      count: generalCountQuestions,
+      countAnswered: countAnsweredQuestions,
+    };
   }
 
   async getSession(sessionId: string) {
@@ -72,11 +91,13 @@ export class SessionService {
         'test_sessions.test_id',
         'questions.question_id',
         'questions.is_answered',
+        'question.title',
         'answers.answer_id',
       ])
       .where({ id: sessionId })
       .innerJoin('test_sessions.sessionAnswers', 'answers')
       .innerJoin('test_sessions.sessionQuestions', 'questions')
+      .innerJoin('questions.question', 'question')
       .getOne();
 
     return sessionRecord;

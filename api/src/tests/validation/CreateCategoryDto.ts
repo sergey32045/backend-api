@@ -18,4 +18,12 @@ export class CreateCategoryDto {
   @MaxLength(1000)
   @ApiProperty({ example: 'Javascript', description: 'Category title' })
   title: string;
+
+  @IsNotEmpty()
+  @MaxLength(2000)
+  @ApiProperty({
+    example: 'Description category',
+    description: 'Description category',
+  })
+  description: string;
 }
