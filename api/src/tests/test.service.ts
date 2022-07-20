@@ -86,13 +86,11 @@ export class TestService {
   }
 
   async updateQuestion(id: number, data: UpdateQuestionDto) {
-    // const question = await this.questionRepository.findOne({ where: { id }, relations: [ "answers" ] });
-    const question = await this.questionRepository
-      .createQueryBuilder('questions')
-      .innerJoinAndSelect('questions.answers', 'answers')
-      .where('answers.is_correct = :isCorrect', { isCorrect: true })
-      .where('questions.id = :id', { id })
-      .getOne();
+    const question = await this.questionRepository.findOne({
+      where: { id },
+      relations: ['answers'],
+    });
+
     if (!question) {
       throw new BadRequestException("Question doesn't exists");
     }

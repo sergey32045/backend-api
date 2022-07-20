@@ -11,6 +11,7 @@ import {
   Put,
   Param,
   Req,
+  Delete,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { TestService } from '../test.service';
@@ -59,6 +60,7 @@ export class TestController {
 
   @UseGuards(JwtAuthGuard)
   @Roles(Role.Admin)
+  @Delete(':id')
   async delete(@Param('id') id: number) {
     return this.testService.delete(id);
   }

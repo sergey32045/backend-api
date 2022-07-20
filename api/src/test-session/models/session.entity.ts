@@ -15,6 +15,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Question } from '../../tests/models/question.entity';
 import { Answer } from '../../tests/models/answer.entity';
 import { Transform } from 'class-transformer';
+import { Test } from '../../tests/models/test.entity';
 
 @Entity('test_sessions')
 export class Session {
@@ -70,6 +71,13 @@ export class Session {
   @OneToMany(() => SessionAnswer, (sessionAnswer) => sessionAnswer.session)
   @JoinColumn({ name: 'id', referencedColumnName: 'session_id' })
   public sessionAnswers: SessionAnswer[];
+
+  @Transform(({ value }) => {
+    return value ? value.title : null;
+  })
+  @ManyToOne(() => Test, (test) => test.sessions)
+  @JoinColumn({ name: 'test_id', referencedColumnName: 'id' })
+  test: Test;
 
   @CreateDateColumn()
   created_at: Date;

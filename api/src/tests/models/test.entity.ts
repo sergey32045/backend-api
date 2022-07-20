@@ -13,6 +13,7 @@ import { TestCategory } from './test-category.entity';
 import { Question } from './question.entity';
 import { Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { Session } from '../../test-session/models/session.entity';
 
 @Entity('tests')
 export class Test {
@@ -34,6 +35,10 @@ export class Test {
 
   @OneToMany(() => Question, (question) => question.test)
   questions: Question[];
+
+  @OneToMany(() => Session, (session) => session.test)
+  @JoinColumn({ name: 'id', referencedColumnName: 'test_id' })
+  public sessions: Session[];
 
   @Transform(({ value }) => value.title)
   @ManyToOne((type) => TestCategory)

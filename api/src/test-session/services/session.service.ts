@@ -35,7 +35,7 @@ export class SessionService {
     if (testRecord) {
       const session = new Session();
       session.status = 'started';
-      session.test_id = 1;
+      session.test_id = testRecord.id;
       return this.sessionRepository.save(session);
     }
     throw new BadRequestException('test not found');
@@ -92,11 +92,13 @@ export class SessionService {
         'questions.question_id',
         'questions.is_answered',
         'question.title',
+        'test.title',
         'answers.answer_id',
       ])
       .where({ id: sessionId })
       .innerJoin('test_sessions.sessionAnswers', 'answers')
       .innerJoin('test_sessions.sessionQuestions', 'questions')
+      .innerJoin('test_sessions.test', 'test')
       .innerJoin('questions.question', 'question')
       .getOne();
 

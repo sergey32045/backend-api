@@ -10,7 +10,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateQuestionDto {
   @ApiProperty({ example: 'What is Javascript?', description: 'Text question' })
-  @MaxLength(5000)
+  @MaxLength(10000)
   @IsOptional()
   question: string;
 
