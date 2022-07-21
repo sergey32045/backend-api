@@ -120,7 +120,6 @@ export class SessionService {
 
     const answers = await this.answerRepository
       .createQueryBuilder('answers')
-      .andWhereInIds(data.answerIds)
       .innerJoin('answers.question', 'question')
       .andWhere('question.test_id = :testId', { testId: sessionRecord.test_id })
       .andWhere('answers.question_id IN(:...questionId)', {
