@@ -28,6 +28,17 @@ export class QuestionsController {
 
   @ApiResponse({
     status: 200,
+    description: 'The found record',
+    type: Question,
+  })
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get(':id')
+  async get(@Param('id') id: number) {
+    return this.testService.getQuestion(id);
+  }
+
+  @ApiResponse({
+    status: 200,
     description: 'Question records',
     type: [Question],
   })

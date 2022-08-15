@@ -13,14 +13,12 @@ import { Label } from './label.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Answer } from './answer.entity';
 import { SessionQuestion } from '../../test-session/models/session.entity';
+import { Expose, Transform } from 'class-transformer';
 
 @Entity('questions')
 export class Question {
   @PrimaryGeneratedColumn({ unsigned: true })
   id: number;
-
-  @Column({ unsigned: true, nullable: false })
-  test_id: number;
 
   @ApiProperty({ example: ' Question text' })
   @Column({ type: 'text', nullable: false })
@@ -38,10 +36,6 @@ export class Question {
   @Column({ type: 'boolean', default: false })
   is_multiselect: boolean;
 
-  @ManyToOne(() => Test, (test) => test.questions)
-  @JoinColumn({ name: 'test_id', referencedColumnName: 'id' })
-  test: Test;
-
   @OneToMany(() => Answer, (answer) => answer.question)
   answers: Answer[];
 
@@ -52,6 +46,24 @@ export class Question {
     inverseJoinColumn: { name: 'label_id' },
   })
   labels: Label[];
+
+  @Expose({ name: 'testIds' })
+  @Transform(({ value }) => {
+    const values = value
+      ? value.flatMap((test: Test) => {
+          return test.id;
+        })
+      : [];
+
+    return values;
+  })
+  @ManyToMany(() => Test)
+  @JoinTable({
+    name: 'question_test',
+    joinColumn: { name: 'question_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'test_id', referencedColumnName: 'id' },
+  })
+  tests: Test[];
 
   @OneToMany(
     () => SessionQuestion,

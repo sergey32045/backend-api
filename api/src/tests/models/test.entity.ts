@@ -8,6 +8,8 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { TestCategory } from './test-category.entity';
 import { Question } from './question.entity';
@@ -33,7 +35,12 @@ export class Test {
   @Column({ type: 'mediumtext', nullable: false })
   title: string;
 
-  @OneToMany(() => Question, (question) => question.test)
+  @ManyToMany(() => Question, (question) => question.tests)
+  @JoinTable({
+    name: 'question_test',
+    joinColumn: { name: 'question_id' },
+    inverseJoinColumn: { name: 'test_id' },
+  })
   questions: Question[];
 
   @OneToMany(() => Session, (session) => session.test)

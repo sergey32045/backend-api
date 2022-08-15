@@ -76,13 +76,28 @@ export class TestService {
     return this.answerRepository.delete(id);
   }
 
+  async getQuestion(id: number): Promise<Question> {
+    // return  await this.questionRepository.find({
+    //   relations: {
+    //     tests: true,
+    //   },
+    //   where: {
+    //     id
+    //   }
+    // })
+    return await this.questionRepository
+      .createQueryBuilder('questions')
+      .leftJoinAndSelect('questions.tests', 'tests')
+      .where({ id })
+      .getOne();
+  }
+
   async getQuestions(params: GetQuestionsParams): Promise<Question[]> {
-    return this.questionRepository.find({
-      where: {
-        test_id: params.testid,
-      },
-      relations: ['labels'],
-    });
+    return await this.questionRepository
+      .createQueryBuilder('questions')
+      .innerJoin('question_test', 'qt', 'qt.question_id = questions.id')
+      .where('qt.test_id = :testId', { testId: params.testid })
+      .getMany();
   }
 
   async updateQuestion(id: number, data: UpdateQuestionDto) {
@@ -113,6 +128,12 @@ export class TestService {
       });
       question.labels = labels;
     }
+    if (data.testIds) {
+      const tests = await this.testsRepository.find({
+        where: { id: In(data.testIds) },
+      });
+      question.tests = tests;
+    }
 
     return this.questionRepository.save(question);
   }
@@ -125,7 +146,6 @@ export class TestService {
     const question = new Question();
     question.question = data.question;
     question.level = data.level;
-    question.test_id = testId;
     question.title = data.title;
     question.is_multiselect = data.is_multiselect;
 
@@ -134,6 +154,13 @@ export class TestService {
         where: { id: In(data.labelIds) },
       });
       question.labels = labels;
+    }
+
+    if (data.testIds) {
+      const tests = await this.testsRepository.find({
+        where: { id: In(data.testIds) },
+      });
+      question.tests = tests;
     }
 
     return this.questionRepository.save(question);

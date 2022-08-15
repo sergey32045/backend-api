@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Test } from '../../tests/models/test.entity';
-import { In, Not, Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import {
   Session,
   SessionAnswer,
@@ -47,38 +47,46 @@ export class SessionService {
         id: sessionId,
       },
     });
-    const sessionQuestions = await this.sessionQuestionRepository.findBy({
-      session_id: sessionId,
-    });
+    if (!sessionRecord) {
+      throw new BadRequestException('session not found');
+    }
+    const queries: Promise<any>[] = [];
 
-    const question = await this.questionRepository.findOneBy({
-      id: Not(
-        In(
-          sessionQuestions.flatMap(
-            (sessionQuestion) => sessionQuestion.question_id,
-          ),
-        ),
-      ),
-      test_id: sessionRecord.test_id,
-    });
+    queries.push(
+      this.sessionQuestionRepository.countBy({
+        session_id: sessionId,
+      }),
+    );
 
-    const countAnsweredQuestions = await this.questionRepository.countBy({
-      id: In(
-        sessionQuestions.flatMap(
-          (sessionQuestion) => sessionQuestion.question_id,
-        ),
-      ),
-      test_id: sessionRecord.test_id,
-    });
+    queries.push(
+      this.questionRepository
+        .createQueryBuilder('questions')
+        .leftJoin('questions.sessionQuestions', 'sq', 'sq.session_id = :sid', {
+          sid: sessionId,
+        })
+        .innerJoin('question_test', 'qt', 'qt.question_id = questions.id')
+        .where('qt.test_id = :testId', { testId: sessionRecord.test_id })
+        .andWhere('sq.question_id IS NULL')
+        .orderBy('RAND()')
+        .getOne(),
+    );
 
-    const generalCountQuestions = await this.questionRepository.countBy({
-      test_id: sessionRecord.test_id,
-    });
+    queries.push(
+      this.questionRepository
+        .createQueryBuilder('questions')
+        .innerJoin('questions.tests', 'tests')
+        .andWhere('tests.id = :testId', { testId: sessionRecord.test_id })
+        .getCount(),
+    );
+
+    const [countAnsweredQuestions, question, generalCountQuestions] =
+      await Promise.all(queries);
 
     return {
       question,
       count: generalCountQuestions,
       countAnswered: countAnsweredQuestions,
+      test_id: sessionRecord.test_id,
     };
   }
 
@@ -121,7 +129,8 @@ export class SessionService {
     const answers = await this.answerRepository
       .createQueryBuilder('answers')
       .innerJoin('answers.question', 'question')
-      .andWhere('question.test_id = :testId', { testId: sessionRecord.test_id })
+      .innerJoin('question_test', 'qt', 'qt.question_id = question.id')
+      .andWhere('qt.test_id = :testId', { testId: sessionRecord.test_id })
       .andWhere('answers.question_id IN(:...questionId)', {
         questionId: [data.questionId],
       })
@@ -134,9 +143,12 @@ export class SessionService {
     const savedAnswers = await this.saveAnswers(sessionId, answers, data);
 
     if (data.questionId) {
-      const questions = await this.questionRepository.find({
-        where: { id: In([data.questionId]), test_id: sessionRecord.test_id },
-      });
+      const questions = await this.questionRepository
+        .createQueryBuilder('questions')
+        .innerJoin('question_test', 'qt', 'qt.question_id = questions.id')
+        .andWhere('qt.test_id = :testId', { testId: sessionRecord.test_id })
+        .andWhere({ id: In([data.questionId]) })
+        .getMany();
       const sessionQuestions: SessionQuestion[] = [];
       for (const question of questions) {
         const sessionQuestion = new SessionQuestion();
@@ -180,19 +192,11 @@ export class SessionService {
         (answer) => answer.question_id === question.id && answer.is_correct,
       );
 
-      if (correctQuestionAnswers.length < 1) {
+      if (
+        correctQuestionAnswers.length > sessionCorrectAnswers.length ||
+        savedAnswers.length > correctQuestionAnswers.length
+      ) {
         return false;
-      }
-
-      for (const correctQuestionAnswer of correctQuestionAnswers) {
-        const hasCorrectAnswer = sessionCorrectAnswers.find(
-          (sessionAnswer) =>
-            correctQuestionAnswer.id === sessionAnswer.answer_id,
-        );
-
-        if (!hasCorrectAnswer) {
-          return false;
-        }
       }
 
       return true;
@@ -229,13 +233,16 @@ export class SessionService {
     for (const answer of answers) {
       const sessionAnswer = new SessionAnswer();
 
-      const isAnswerCorrect = data.answerIds.find(
-        (answerId) => answer.id == answerId && answer.is_correct,
+      const isAnswerPresent = data.answerIds.find(
+        (answerId) => answer.id == answerId,
       );
+      if (!isAnswerPresent) {
+        continue;
+      }
 
       sessionAnswer.session_id = sessionId;
       sessionAnswer.answer_id = answer.id;
-      sessionAnswer.is_correct = !!isAnswerCorrect;
+      sessionAnswer.is_correct = answer.is_correct;
       sessionAnswers.push(sessionAnswer);
     }
     return await this.sessionAnswerRepository.save(sessionAnswers);

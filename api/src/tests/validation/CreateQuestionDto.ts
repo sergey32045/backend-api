@@ -28,6 +28,11 @@ export class CreateQuestionDto {
   @IsArray()
   labelIds: number[];
 
+  @ApiProperty({ example: [1, 2, 3], description: 'Test IDs' })
+  @IsOptional()
+  @IsArray()
+  testIds: number[];
+
   @ApiProperty({ example: 1, description: 'Question level' })
   @IsNotEmpty()
   @IsInt()
