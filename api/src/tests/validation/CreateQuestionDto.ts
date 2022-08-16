@@ -1,4 +1,5 @@
 import {
+  ArrayNotEmpty,
   IsArray,
   IsBoolean,
   IsInt,
@@ -29,7 +30,7 @@ export class CreateQuestionDto {
   labelIds: number[];
 
   @ApiProperty({ example: [1, 2, 3], description: 'Test IDs' })
-  @IsOptional()
+  @ArrayNotEmpty()
   @IsArray()
   testIds: number[];
 
