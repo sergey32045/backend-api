@@ -1,30 +1,48 @@
 import {
+  Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
+  Param,
+  Post,
+  Put,
   Request,
   UseInterceptors,
-  Post,
-  Body,
-  Put,
-  Param,
-  Delete,
 } from '@nestjs/common';
 import { TestService } from '../test.service';
+import { S3FileService } from '../S3/s3-file.service';
 import { ApiResponse } from '@nestjs/swagger';
 import { Test } from '../models/test.entity';
 import { Question } from '../models/question.entity';
 import {
   CreateQuestionDto,
-  UpdateQuestionDto,
   GetQuestionsParams,
+  UpdateQuestionDto,
 } from '../validation';
 import { Roles } from '../../auth/rbac/roles.decorator';
 import { Role } from '../../auth/rbac/role.enum';
 
 @Controller('tests/:testid/questions')
 export class QuestionsController {
-  constructor(private testService: TestService) {}
+  constructor(
+    private testService: TestService,
+    private s3FileService: S3FileService,
+  ) {}
+
+  @Roles(Role.Admin)
+  @Post('/upload')
+  async generatePreSignedPutUrl(
+    @Body() { fileName, fileType }: { fileName: string; fileType: string },
+  ) {
+    const url = await this.s3FileService.generatePreSignedPutUrl(
+      fileName,
+      fileType,
+    );
+    return {
+      url,
+    };
+  }
 
   @ApiResponse({
     status: 200,

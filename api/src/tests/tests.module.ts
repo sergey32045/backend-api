@@ -13,13 +13,17 @@ import { Answer } from './models/answer.entity';
 import { AnswersController } from './controllers/answers.controller';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { S3FileService } from './S3/s3-file.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule,
     TypeOrmModule.forFeature([Test, Question, TestCategory, Label, Answer]),
   ],
   providers: [
     TestService,
+    S3FileService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
