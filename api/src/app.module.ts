@@ -16,7 +16,6 @@ import { LikeModule } from './likecounter/like.module';
     TestsModule,
     LikeModule,
     ConfigModule.forRoot({
-      envFilePath: `src/config/env/.${process.env.NODE_ENV}.env`,
       load: [configuration],
     }),
     TypeOrmModule.forRootAsync({

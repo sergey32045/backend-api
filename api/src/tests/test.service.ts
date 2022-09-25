@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as AWS from 'aws-sdk';
 import { In, Not, Repository } from 'typeorm';
 import { Test } from './models/test.entity';
 import {
@@ -20,6 +21,7 @@ import { Question } from './models/question.entity';
 import { Label } from './models/label.entity';
 import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
 import { Answer } from './models/answer.entity';
+import { Attachment } from './models/attachment.entity';
 
 @Injectable()
 export class TestService {
@@ -34,6 +36,8 @@ export class TestService {
     private labelRepository: Repository<Label>,
     @InjectRepository(Answer)
     private answerRepository: Repository<Answer>,
+    @InjectRepository(Attachment)
+    private attachmentRepository: Repository<Attachment>,
   ) {}
 
   async getAnswers(params: GetAnswersParams): Promise<Answer[]> {
@@ -77,17 +81,10 @@ export class TestService {
   }
 
   async getQuestion(id: number): Promise<Question> {
-    // return  await this.questionRepository.find({
-    //   relations: {
-    //     tests: true,
-    //   },
-    //   where: {
-    //     id
-    //   }
-    // })
     return await this.questionRepository
       .createQueryBuilder('questions')
       .leftJoinAndSelect('questions.tests', 'tests')
+      .leftJoinAndSelect('questions.attachments', 'files')
       .where({ id })
       .getOne();
   }
@@ -103,7 +100,7 @@ export class TestService {
   async updateQuestion(id: number, data: UpdateQuestionDto) {
     const question = await this.questionRepository.findOne({
       where: { id },
-      relations: ['answers'],
+      relations: ['answers', 'attachments'],
     });
 
     if (!question) {
@@ -134,8 +131,45 @@ export class TestService {
       });
       question.tests = tests;
     }
+    if (data.files) {
+      const oldAttachments = question.attachments;
+      const attachments = await this.attachmentRepository.find({
+        where: { id: In(data.files) },
+      });
+      question.attachments = attachments;
 
-    return this.questionRepository.save(question);
+      const removeAttachmentsFromS3 = oldAttachments.filter(
+        ({ id: id1 }) => !attachments.some(({ id: id2 }) => id2 === id1),
+      );
+
+      await this.questionRepository.save(question);
+
+      if (removeAttachmentsFromS3.length > 0) {
+        const objectsKeys = removeAttachmentsFromS3.map((attachment) => {
+          return { Key: attachment.url.split('/').reverse()[0] };
+        });
+
+        const myBucket = new AWS.S3({
+          region: 'eu-central-1',
+        });
+        await new Promise((res, rej) => {
+          myBucket.deleteObjects(
+            {
+              Bucket: 'interviewboom-filestorage',
+              Delete: {
+                Objects: objectsKeys,
+              },
+            },
+            (err, data) => {
+              if (err) {
+                return rej(err);
+              }
+              res(data);
+            },
+          );
+        });
+      }
+    }
   }
 
   async deleteQuestion(id: number) {
@@ -161,6 +195,12 @@ export class TestService {
         where: { id: In(data.testIds) },
       });
       question.tests = tests;
+    }
+    if (data.files) {
+      const attachments = await this.attachmentRepository.find({
+        where: { id: In(data.files) },
+      });
+      question.attachments = attachments;
     }
 
     return this.questionRepository.save(question);

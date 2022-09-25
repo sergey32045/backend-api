@@ -14,6 +14,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Answer } from './answer.entity';
 import { SessionQuestion } from '../../test-session/models/session.entity';
 import { Expose, Transform } from 'class-transformer';
+import { Attachment } from './attachment.entity';
 
 @Entity('questions')
 export class Question {
@@ -64,6 +65,15 @@ export class Question {
     inverseJoinColumn: { name: 'test_id', referencedColumnName: 'id' },
   })
   tests: Test[];
+
+  @Expose({ name: 'files' })
+  @ManyToMany(() => Attachment)
+  @JoinTable({
+    name: 'question_attachments',
+    joinColumn: { name: 'question_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'attachment_id', referencedColumnName: 'id' },
+  })
+  attachments: Attachment[];
 
   @OneToMany(
     () => SessionQuestion,

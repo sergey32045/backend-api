@@ -40,4 +40,12 @@ export class UpdateQuestionDto {
   @ApiProperty({ example: true, description: 'is multiselect question or not' })
   @IsBoolean()
   is_multiselect: boolean;
+
+  @ApiProperty({
+    example: [1, 2, 3],
+    description: 'File IDs',
+  })
+  @IsOptional()
+  @IsArray()
+  files: number[];
 }

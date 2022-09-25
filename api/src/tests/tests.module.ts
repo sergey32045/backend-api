@@ -15,15 +15,26 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { S3FileService } from './S3/s3-file.service';
 import { ConfigModule } from '@nestjs/config';
+import { AttachmentsController } from './controllers/attachments.controller';
+import { Attachment } from './models/attachment.entity';
+import { AttachmentsService } from './attachments.service';
 
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([Test, Question, TestCategory, Label, Answer]),
+    TypeOrmModule.forFeature([
+      Test,
+      Question,
+      TestCategory,
+      Label,
+      Answer,
+      Attachment,
+    ]),
   ],
   providers: [
     TestService,
     S3FileService,
+    AttachmentsService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
@@ -35,6 +46,7 @@ import { ConfigModule } from '@nestjs/config';
     QuestionsController,
     LabelsController,
     AnswersController,
+    AttachmentsController,
   ],
   exports: [TestService, TypeOrmModule],
 })

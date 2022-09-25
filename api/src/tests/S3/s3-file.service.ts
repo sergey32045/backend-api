@@ -14,15 +14,16 @@ export class S3FileService {
 
     const S3_BUCKET = 'interviewboom-filestorage';
     const REGION = 'eu-central-1';
-    const URL_EXPIRATION_TIME = 60; // in seconds
+    const URL_EXPIRATION_TIME = 260; // in seconds
 
     const myBucket = new AWS.S3({
-      params: { Bucket: S3_BUCKET },
       region: REGION,
     });
-    return myBucket.getSignedUrl('putObject', {
+
+    return myBucket.getSignedUrlPromise('putObject', {
       Key: fileName,
       ContentType: fileType,
+      Bucket: S3_BUCKET,
       Expires: URL_EXPIRATION_TIME,
     });
   }
