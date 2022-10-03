@@ -16,6 +16,7 @@ env:
   AWS_REGION: eu-central-1                   # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY_API: interviewboom  
   ECR_REPOSITORY_NGINX: interviewboom-nginx
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
 
 jobs:
   deploy:
@@ -42,7 +43,7 @@ jobs:
         id: build-api-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.branch }}
+          IMAGE_TAG: ${{ env.BRANCH_NAME }}
         run: |
           # Build a docker container and
           # push it to ECR so that it can
@@ -55,7 +56,7 @@ jobs:
         id: build-nginx-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.branch }}
+          IMAGE_TAG: ${{ env.BRANCH_NAME }}
         run: |
           # Build a docker container and
           # push it to ECR so that it can
