@@ -16,7 +16,8 @@ env:
   AWS_REGION: eu-central-1                   # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY_API: interviewboom  
   ECR_REPOSITORY_NGINX: interviewboom-nginx
-  BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+  NODE_VERSION: 16
 
 jobs:
   deploy:
@@ -27,6 +28,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Install NodeJS
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Dependencies
+        run: cd api && yarn install --frozen-lockfile
+
+      - name: Code Linting
+        run: cd api && yarn format:check
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
