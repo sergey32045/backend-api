@@ -13,14 +13,6 @@ async function bootstrap() {
     }),
   );
   app.enableCors();
-  app.setGlobalPrefix('api', {
-    exclude: [
-      {
-        path: '.well-known/pki-validation/3261FC6A37BFF23693EFD1B4C7AE49D7.txt',
-        method: RequestMethod.GET,
-      },
-    ],
-  });
 
   const config = new DocumentBuilder()
     .setTitle('InterviewBoom API doc')
