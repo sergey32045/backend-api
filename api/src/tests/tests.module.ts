@@ -2,22 +2,27 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TestService } from './test.service';
 import { TestController } from './controllers/test.controller';
-import { Test } from './models/test.entity';
-import { Question } from './models/question.entity';
-import { TestCategory } from './models/test-category.entity';
+import {
+  Test,
+  Question,
+  TestCategory,
+  Label,
+  Answer,
+  Attachment,
+  Position,
+} from './models/';
 import { CategoriesController } from './controllers/categories.controller';
-import { Label } from './models/label.entity';
 import { QuestionsController } from './controllers/questions.controller';
 import { LabelsController } from './controllers/labels.controller';
-import { Answer } from './models/answer.entity';
 import { AnswersController } from './controllers/answers.controller';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { S3FileService } from './S3/s3-file.service';
 import { ConfigModule } from '@nestjs/config';
 import { AttachmentsController } from './controllers/attachments.controller';
-import { Attachment } from './models/attachment.entity';
 import { AttachmentsService } from './attachments.service';
+import { PositionsController } from './controllers/positions.controller';
+import { PositionsService } from './positions.service';
 
 @Module({
   imports: [
@@ -29,12 +34,14 @@ import { AttachmentsService } from './attachments.service';
       Label,
       Answer,
       Attachment,
+      Position,
     ]),
   ],
   providers: [
     TestService,
     S3FileService,
     AttachmentsService,
+    PositionsService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
@@ -47,6 +54,7 @@ import { AttachmentsService } from './attachments.service';
     LabelsController,
     AnswersController,
     AttachmentsController,
+    PositionsController,
   ],
   exports: [TestService, TypeOrmModule],
 })

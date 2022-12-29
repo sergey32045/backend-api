@@ -1,3 +1,5 @@
+import { Test } from '../tests/models';
+
 interface ToNumberOptions {
   default?: number;
   min?: number;
@@ -22,4 +24,12 @@ export function toNumber(value: string, opts: ToNumberOptions = {}): number {
   }
 
   return newValue;
+}
+
+export function mapEntityToIds(value: { id: any }[]) {
+  return value
+    ? value.flatMap((test: Test) => {
+        return test.id;
+      })
+    : [];
 }

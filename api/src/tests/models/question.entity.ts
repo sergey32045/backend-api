@@ -2,7 +2,6 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToOne,
   JoinColumn,
   ManyToMany,
   JoinTable,
@@ -15,6 +14,8 @@ import { Answer } from './answer.entity';
 import { SessionQuestion } from '../../test-session/models/session.entity';
 import { Expose, Transform } from 'class-transformer';
 import { Attachment } from './attachment.entity';
+import { Position } from './position.entity';
+import { mapEntityToIds } from '../../common/validation.helper';
 
 @Entity('questions')
 export class Question {
@@ -29,10 +30,6 @@ export class Question {
   @Column({ type: 'text', nullable: false })
   title: string;
 
-  @ApiProperty({ example: 1 })
-  @Column({ type: 'int' })
-  level: number;
-
   @ApiProperty({ example: true })
   @Column({ type: 'boolean', default: false })
   is_multiselect: boolean;
@@ -40,6 +37,7 @@ export class Question {
   @OneToMany(() => Answer, (answer) => answer.question)
   answers: Answer[];
 
+  @Transform(({ value }) => mapEntityToIds(value))
   @ManyToMany(() => Label)
   @JoinTable({
     name: 'question_label',
@@ -49,15 +47,7 @@ export class Question {
   labels: Label[];
 
   @Expose({ name: 'testIds' })
-  @Transform(({ value }) => {
-    const values = value
-      ? value.flatMap((test: Test) => {
-          return test.id;
-        })
-      : [];
-
-    return values;
-  })
+  @Transform(({ value }) => mapEntityToIds(value))
   @ManyToMany(() => Test)
   @JoinTable({
     name: 'question_test',
@@ -74,6 +64,16 @@ export class Question {
     inverseJoinColumn: { name: 'attachment_id', referencedColumnName: 'id' },
   })
   attachments: Attachment[];
+
+  @Expose({ name: 'positions' })
+  @Transform(({ value }) => mapEntityToIds(value))
+  @ManyToMany(() => Position)
+  @JoinTable({
+    name: 'question_positions',
+    joinColumn: { name: 'question_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'position_id', referencedColumnName: 'id' },
+  })
+  positions: Position[];
 
   @OneToMany(
     () => SessionQuestion,

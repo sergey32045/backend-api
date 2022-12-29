@@ -7,7 +7,10 @@ import {Answer} from "./src/tests/models/answer.entity";
 import {Test} from "./src/tests/models/test.entity";
 import {Session, SessionAnswer, SessionQuestion} from "./src/test-session/models/session.entity";
 import {TestCategory} from "./src/tests/models/test-category.entity";
+import {Attachment} from "./src/tests/models/attachment.entity";
+import {Position} from "./src/tests/models";
 
+console.log(process.env.DB_PASSWORD, 'process.env.DB_PASSWORD >>>>')
 const connectionSource = new DataSource({
     migrationsTableName: 'migrations',
     type: 'mysql',
@@ -21,7 +24,7 @@ const connectionSource = new DataSource({
     name: 'default',
     migrations: ['migrations/*{.ts,.js}'],
     entities: [
-        Question, Test, Answer, Label, Session, SessionAnswer, SessionQuestion, TestCategory
+        Question, Test, Answer, Label, Session, SessionAnswer, SessionQuestion, TestCategory, Attachment, Label, Position
     ]
 });
 

@@ -25,17 +25,12 @@ export class UpdateQuestionDto {
   @ApiProperty({ example: [1, 2, 3], description: 'Question labels' })
   @IsArray()
   @IsOptional()
-  labelIds: number[];
+  labels: number[];
 
   @ApiProperty({ example: [1, 2, 3], description: 'Test IDs' })
   @ArrayNotEmpty()
   @IsArray()
   testIds: number[];
-
-  @ApiProperty({ example: 1, description: 'Question level' })
-  @IsInt()
-  @IsOptional()
-  level: number;
 
   @ApiProperty({ example: true, description: 'is multiselect question or not' })
   @IsBoolean()
@@ -48,4 +43,9 @@ export class UpdateQuestionDto {
   @IsOptional()
   @IsArray()
   files: number[];
+
+  @ApiProperty({ example: [1, 2, 3], description: 'Question positions' })
+  @IsOptional()
+  @IsArray()
+  positions: number[];
 }

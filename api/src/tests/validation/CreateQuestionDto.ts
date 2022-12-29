@@ -25,19 +25,18 @@ export class CreateQuestionDto {
 
   @ApiProperty({ example: [1, 2, 3], description: 'Question labels' })
   @IsOptional()
-  @IsNotEmpty()
   @IsArray()
-  labelIds: number[];
+  labels: number[];
 
   @ApiProperty({ example: [1, 2, 3], description: 'Test IDs' })
   @ArrayNotEmpty()
   @IsArray()
   testIds: number[];
 
-  @ApiProperty({ example: 1, description: 'Question level' })
-  @IsNotEmpty()
-  @IsInt()
-  level: number;
+  @ApiProperty({ example: [1, 2, 3], description: 'Question positions' })
+  @IsOptional()
+  @IsArray()
+  positions: number[];
 
   @ApiProperty({ example: true, description: 'is multiselect question or not' })
   @IsBoolean()

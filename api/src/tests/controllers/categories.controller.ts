@@ -14,10 +14,9 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { TestService } from '../test.service';
-import { CreateCategoryDto } from '../validation/CreateCategoryDto';
+import { CreateCategoryDto, QueryCategoriesDto } from '../validation';
 import { ApiResponse } from '@nestjs/swagger';
-import { TestCategory } from '../models/test-category.entity';
-import { QueryCategoriesDto } from '../validation/QueryCategoriesDto';
+import { TestCategory } from '../models';
 import { Roles } from '../../auth/rbac/roles.decorator';
 import { Role } from '../../auth/rbac/role.enum';
 

@@ -22,12 +22,14 @@ import {
 } from '../validation';
 import { Roles } from '../../auth/rbac/roles.decorator';
 import { Role } from '../../auth/rbac/role.enum';
+import { AttachmentsService } from '../attachments.service';
 
 @Controller('tests/:testid/questions')
 export class QuestionsController {
   constructor(
     private testService: TestService,
     private s3FileService: S3FileService,
+    private attachmentService: AttachmentsService,
   ) {}
 
   @Roles(Role.Admin)
@@ -91,7 +93,15 @@ export class QuestionsController {
     @Body() testData: UpdateQuestionDto,
     @Param() params: GetQuestionsParams,
   ) {
-    return this.testService.updateQuestion(params.id, testData);
+    const [, oldAttachments] = await this.testService.updateQuestion(
+      params.id,
+      testData,
+    );
+
+    await this.attachmentService.updateQuestionAttachments(
+      oldAttachments,
+      testData,
+    );
   }
 
   @Roles(Role.Admin)

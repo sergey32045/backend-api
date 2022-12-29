@@ -1,8 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as AWS from 'aws-sdk';
 import { In, Not, Repository } from 'typeorm';
-import { Test } from './models/test.entity';
+import {
+  Test,
+  TestCategory,
+  Question,
+  Label,
+  Answer,
+  Attachment,
+  Position,
+} from './models';
 import {
   CreateTestDto,
   UpdateTestDto,
@@ -16,12 +23,8 @@ import {
   CreateAnswerDto,
   UpdateAnswerDto,
 } from './validation';
-import { TestCategory } from './models/test-category.entity';
-import { Question } from './models/question.entity';
-import { Label } from './models/label.entity';
 import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
-import { Answer } from './models/answer.entity';
-import { Attachment } from './models/attachment.entity';
+import { CreateLabelDto } from './validation/CreateLabelDto';
 
 @Injectable()
 export class TestService {
@@ -38,6 +41,8 @@ export class TestService {
     private answerRepository: Repository<Answer>,
     @InjectRepository(Attachment)
     private attachmentRepository: Repository<Attachment>,
+    @InjectRepository(Position)
+    private positionRepository: Repository<Position>,
   ) {}
 
   async getAnswers(params: GetAnswersParams): Promise<Answer[]> {
@@ -85,6 +90,8 @@ export class TestService {
       .createQueryBuilder('questions')
       .leftJoinAndSelect('questions.tests', 'tests')
       .leftJoinAndSelect('questions.attachments', 'files')
+      .leftJoinAndSelect('questions.positions', 'positions')
+      .leftJoinAndSelect('questions.labels', 'labels')
       .where({ id })
       .getOne();
   }
@@ -97,18 +104,21 @@ export class TestService {
       .getMany();
   }
 
-  async updateQuestion(id: number, data: UpdateQuestionDto) {
+  async updateQuestion(
+    id: number,
+    data: UpdateQuestionDto,
+  ): Promise<[Question, Attachment[]]> {
     const question = await this.questionRepository.findOne({
       where: { id },
       relations: ['answers', 'attachments'],
     });
+    const oldAttachments = question.attachments;
 
     if (!question) {
       throw new BadRequestException("Question doesn't exists");
     }
 
     question.question = data.question;
-    question.level = data.level;
     question.is_multiselect = data.is_multiselect;
     question.title = data.title;
 
@@ -119,9 +129,9 @@ export class TestService {
       throw new BadRequestException('Question has more than one answer');
     }
 
-    if (data.labelIds) {
+    if (data.labels) {
       const labels = await this.labelRepository.find({
-        where: { id: In(data.labelIds) },
+        where: { id: In(data.labels) },
       });
       question.labels = labels;
     }
@@ -132,44 +142,20 @@ export class TestService {
       question.tests = tests;
     }
     if (data.files) {
-      const oldAttachments = question.attachments;
       const attachments = await this.attachmentRepository.find({
         where: { id: In(data.files) },
       });
       question.attachments = attachments;
-
-      const removeAttachmentsFromS3 = oldAttachments.filter(
-        ({ id: id1 }) => !attachments.some(({ id: id2 }) => id2 === id1),
-      );
-
-      await this.questionRepository.save(question);
-
-      if (removeAttachmentsFromS3.length > 0) {
-        const objectsKeys = removeAttachmentsFromS3.map((attachment) => {
-          return { Key: attachment.url.split('/').reverse()[0] };
-        });
-
-        const myBucket = new AWS.S3({
-          region: 'eu-central-1',
-        });
-        await new Promise((res, rej) => {
-          myBucket.deleteObjects(
-            {
-              Bucket: 'interviewboom-filestorage',
-              Delete: {
-                Objects: objectsKeys,
-              },
-            },
-            (err, data) => {
-              if (err) {
-                return rej(err);
-              }
-              res(data);
-            },
-          );
-        });
-      }
     }
+
+    if (data.positions) {
+      const positions = await this.positionRepository.find({
+        where: { id: In(data.positions) },
+      });
+      question.positions = positions;
+    }
+
+    return [await this.questionRepository.save(question), oldAttachments];
   }
 
   async deleteQuestion(id: number) {
@@ -179,13 +165,12 @@ export class TestService {
   async createQuestion(testId: number, data: CreateQuestionDto) {
     const question = new Question();
     question.question = data.question;
-    question.level = data.level;
     question.title = data.title;
     question.is_multiselect = data.is_multiselect;
 
-    if (data.labelIds) {
+    if (data.labels) {
       const labels = await this.labelRepository.find({
-        where: { id: In(data.labelIds) },
+        where: { id: In(data.labels) },
       });
       question.labels = labels;
     }
@@ -201,6 +186,13 @@ export class TestService {
         where: { id: In(data.files) },
       });
       question.attachments = attachments;
+    }
+
+    if (data.positions) {
+      const positions = await this.positionRepository.find({
+        where: { id: In(data.positions) },
+      });
+      question.positions = positions;
     }
 
     return this.questionRepository.save(question);
@@ -212,6 +204,24 @@ export class TestService {
     }
 
     return this.labelRepository.save(data);
+  }
+
+  async getLabels() {
+    return this.labelRepository.find();
+  }
+
+  async deleteLabel(id: number) {
+    return this.labelRepository.delete(id);
+  }
+
+  async updateLabel(id, data: CreateLabelDto) {
+    console.log(id, 'id');
+    const label = await this.labelRepository.findOne({ where: { id } });
+    if (!label) {
+      throw new BadRequestException("Label doesn't exists");
+    }
+    label.title = data.title;
+    return this.labelRepository.save(label);
   }
 
   async findAllCategories(query: QueryCategoriesDto): Promise<TestCategory[]> {
