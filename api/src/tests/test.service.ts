@@ -100,6 +100,7 @@ export class TestService {
     return await this.questionRepository
       .createQueryBuilder('questions')
       .innerJoin('question_test', 'qt', 'qt.question_id = questions.id')
+      .leftJoinAndSelect('questions.positions', 'positions')
       .where('qt.test_id = :testId', { testId: params.testid })
       .getMany();
   }

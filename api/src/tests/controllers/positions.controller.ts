@@ -2,9 +2,11 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
+  Put,
   Request,
   UseInterceptors,
 } from '@nestjs/common';
@@ -39,5 +41,17 @@ export class PositionsController {
   @Get()
   async getAll(@Request() req) {
     return this.positionService.getPositions();
+  }
+
+  @Roles(Role.Admin)
+  @Delete(':id')
+  async delete(@Param() id: number) {
+    return this.positionService.deletePosition(id);
+  }
+
+  @Roles(Role.Admin)
+  @Put(':id')
+  async update(@Param('id') id: number, @Body() data: CreatePositionDto) {
+    return this.positionService.updatePosition(id, data);
   }
 }

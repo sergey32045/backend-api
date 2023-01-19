@@ -9,9 +9,11 @@ import {
 import { SaveSessionAnswerDto, StartSessionDto } from '../validation';
 import { Answer } from '../../tests/models/answer.entity';
 import { Question } from '../../tests/models/question.entity';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 export class SessionService {
+  static readonly limitQuestions = 20;
+
   constructor(
     @InjectRepository(Test)
     private testsRepository: Repository<Test>,
@@ -34,7 +36,7 @@ export class SessionService {
 
     if (testRecord) {
       const session = new Session();
-      session.status = 'started';
+      session.status = Session.START_SESSION;
       session.test_id = testRecord.id;
       return this.sessionRepository.save(session);
     }
@@ -45,6 +47,7 @@ export class SessionService {
     const sessionRecord = await this.sessionRepository.findOne({
       where: {
         id: sessionId,
+        status: Session.START_SESSION,
       },
     });
     if (!sessionRecord) {
@@ -79,8 +82,19 @@ export class SessionService {
         .getCount(),
     );
 
-    const [countAnsweredQuestions, question, generalCountQuestions] =
+    let [countAnsweredQuestions, question, generalCountQuestions] =
       await Promise.all(queries);
+
+    if (generalCountQuestions > SessionService.limitQuestions) {
+      generalCountQuestions = 20;
+    }
+    if (countAnsweredQuestions >= SessionService.limitQuestions) {
+      question = null;
+    }
+    if (question === null) {
+      sessionRecord.status = Session.COMPLETE_SESSION;
+      await this.sessionRepository.save(sessionRecord);
+    }
 
     return {
       question,
@@ -103,12 +117,15 @@ export class SessionService {
         'test.title',
         'answers.answer_id',
       ])
-      .where({ id: sessionId })
-      .innerJoin('test_sessions.sessionAnswers', 'answers')
+      .where({ id: sessionId, status: Session.COMPLETE_SESSION })
+      .leftJoin('test_sessions.sessionAnswers', 'answers')
       .innerJoin('test_sessions.sessionQuestions', 'questions')
       .innerJoin('test_sessions.test', 'test')
       .innerJoin('questions.question', 'question')
       .getOne();
+    if (!sessionRecord) {
+      throw new NotFoundException('session not found');
+    }
 
     return sessionRecord;
   }
@@ -119,7 +136,7 @@ export class SessionService {
     });
 
     if (!sessionRecord) {
-      throw new BadRequestException('session not found!');
+      throw new NotFoundException('session not found!');
     }
 
     if (!data.answerIds) {

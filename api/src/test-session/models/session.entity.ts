@@ -19,6 +19,9 @@ import { Test } from '../../tests/models/test.entity';
 
 @Entity('test_sessions')
 export class Session {
+  static START_SESSION = 'started';
+  static COMPLETE_SESSION = 'completed';
+
   @ApiProperty({ example: 1 })
   @PrimaryGeneratedColumn('uuid')
   id: string;

@@ -1,5 +1,4 @@
 import {
-  ClassSerializerInterceptor,
   Controller,
   Get,
   Request,
@@ -10,11 +9,10 @@ import {
   Param,
   Delete,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+
 import { TestService } from '../test.service';
 import { ApiResponse } from '@nestjs/swagger';
-import { Test } from '../models/test.entity';
-import { Answer } from '../models/answer.entity';
+import { Answer, Test } from '../models';
 import {
   CreateAnswerDto,
   GetAnswersParams,
@@ -22,6 +20,10 @@ import {
 } from '../validation';
 import { Roles } from '../../auth/rbac/roles.decorator';
 import { Role } from '../../auth/rbac/role.enum';
+import {
+  CustomClassSerializerInterceptor,
+  CustomSerializeOptions,
+} from '../serializers/CustomClassSerializerInterceptor';
 
 @Controller('tests/:testid/questions/:questionid/answers')
 export class AnswersController {
@@ -32,7 +34,11 @@ export class AnswersController {
     description: 'Answer records',
     type: [Answer],
   })
-  @UseInterceptors(ClassSerializerInterceptor)
+  @Roles(Role.Guest)
+  @UseInterceptors(CustomClassSerializerInterceptor)
+  @CustomSerializeOptions({
+    getGroupsFromAuthUser: true,
+  })
   @Get()
   async getAll(@Request() req, @Param() params: GetAnswersParams) {
     return this.testService.getAnswers(params);

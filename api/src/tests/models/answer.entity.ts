@@ -6,7 +6,10 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { Expose } from 'class-transformer';
+
 import { Question } from './question.entity';
+import { Role } from '../../auth/rbac/role.enum';
 
 @Entity('answers')
 export class Answer {
@@ -21,6 +24,7 @@ export class Answer {
 
   @ApiProperty({ example: true })
   @Column({ type: 'boolean', default: false })
+  @Expose({ groups: [Role.Admin] })
   is_correct: boolean;
 
   @ManyToOne(() => Question, (question) => question.answers)
