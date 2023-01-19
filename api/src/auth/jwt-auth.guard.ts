@@ -19,7 +19,11 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       context.getHandler(),
       context.getClass(),
     ]);
-    if (requiredRoles && requiredRoles.some((role) => role === Role.Guest)) {
+    if (
+      !user &&
+      requiredRoles &&
+      requiredRoles.some((role) => role === Role.Guest)
+    ) {
       return true;
     }
     if (err || !user) {
