@@ -16,6 +16,7 @@ env:
   AWS_REGION: eu-central-1                   # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY_API: interviewboom  
   ECR_REPOSITORY_NGINX: interviewboom-nginx
+  ECR_REPOSITORY_DB: interviewboom-db
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
   NODE_VERSION: 16
 
@@ -76,3 +77,15 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_NGINX:$IMAGE_TAG ./docker/nginx -f ./docker/nginx/Dockerfile
           docker push $ECR_REGISTRY/$ECR_REPOSITORY_NGINX:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY_NGINX:$IMAGE_TAG"
+      - name: Build, tag, and push MySQL image to Amazon ECR
+        id: build-mysql-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ env.BRANCH_NAME }}
+        run: |
+          # Build a docker container and
+          # push it to ECR so that it can
+          # be deployed to ECS.
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_DB:$IMAGE_TAG ./docker/mysql -f ./docker/mysql/Dockerfile
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY_DB:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY_DB:$IMAGE_TAG"
