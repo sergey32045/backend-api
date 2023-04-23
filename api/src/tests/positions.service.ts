@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Position } from './models';
 import { Repository } from 'typeorm';
 import { CreatePositionDto } from './validation/CreatePositionDto';
-import { CreateLabelDto } from './validation/CreateLabelDto';
 
 @Injectable()
 export class PositionsService {
@@ -24,7 +23,7 @@ export class PositionsService {
     return this.positionRepository.delete(id);
   }
 
-  async updatePosition(id, data: CreateLabelDto) {
+  async updatePosition(id, data: CreatePositionDto) {
     const position = await this.positionRepository.findOne({ where: { id } });
     if (!position) {
       throw new BadRequestException("Position doesn't exists");

@@ -25,6 +25,7 @@ import {
 } from './validation';
 import { FindOptionsWhere } from 'typeorm/find-options/FindOptionsWhere';
 import { CreateLabelDto } from './validation/CreateLabelDto';
+import { QueryLabelsDto } from './validation/QueryLabelsDto';
 
 @Injectable()
 export class TestService {
@@ -200,15 +201,19 @@ export class TestService {
   }
 
   async createLabel(data: { title: string }): Promise<Label> {
-    if (!data.title) {
-      throw new BadRequestException('title is empty');
-    }
-
     return this.labelRepository.save(data);
   }
 
-  async getLabels() {
-    return this.labelRepository.find();
+  async getLabels({ categoryId }: QueryLabelsDto): Promise<Label[]> {
+    let where: FindOptionsWhere<Label> = {};
+    if (categoryId) {
+      where = { category_id: categoryId };
+    }
+
+    return this.labelRepository.find({
+      where,
+      relations: ['category'],
+    });
   }
 
   async deleteLabel(id: number) {
@@ -222,6 +227,7 @@ export class TestService {
       throw new BadRequestException("Label doesn't exists");
     }
     label.title = data.title;
+    label.category_id = data.category_id;
     return this.labelRepository.save(label);
   }
 

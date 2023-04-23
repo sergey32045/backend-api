@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Request,
   UseInterceptors,
 } from '@nestjs/common';
@@ -15,7 +16,7 @@ import { TestService } from '../test.service';
 import { Label } from '../models';
 import { Roles } from '../../auth/rbac/roles.decorator';
 import { Role } from '../../auth/rbac/role.enum';
-import { CreateLabelDto } from '../validation/CreateLabelDto';
+import { CreateLabelDto, QueryLabelsDto } from '../validation';
 
 @Controller('labels')
 export class LabelsController {
@@ -26,6 +27,7 @@ export class LabelsController {
     description: 'The found record',
     type: Label,
   })
+  @Roles(Role.Admin)
   @Post()
   async create(@Body() data: CreateLabelDto) {
     return this.testService.createLabel(data);
@@ -38,8 +40,8 @@ export class LabelsController {
   })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  async getAll(@Request() req) {
-    return this.testService.getLabels();
+  async getAll(@Request() req, @Query() query: QueryLabelsDto) {
+    return this.testService.getLabels(query);
   }
 
   @Roles(Role.Admin)

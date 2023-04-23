@@ -9,3 +9,5 @@ export { QueryTestsDto } from './QueryTestsDto';
 export { UpdateTestDto } from './UpdateTestDto';
 export { CreateCategoryDto } from './CreateCategoryDto';
 export { QueryCategoriesDto } from './QueryCategoriesDto';
+export { QueryLabelsDto } from './QueryLabelsDto';
+export { CreateLabelDto } from './CreateLabelDto';

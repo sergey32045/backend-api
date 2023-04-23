@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { MaxLength } from 'class-validator';
+import { IsInt, MaxLength } from 'class-validator';
 
 export class CreateLabelDto {
   @ApiProperty({
@@ -8,4 +8,8 @@ export class CreateLabelDto {
   })
   @MaxLength(100)
   title: string;
+
+  @ApiProperty({ example: 1, description: 'Test category' })
+  @IsInt()
+  category_id: number;
 }
