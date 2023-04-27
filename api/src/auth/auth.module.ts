@@ -1,3 +1,4 @@
+require('dotenv').config()
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalStrategy } from './local.strategy';
@@ -20,7 +21,7 @@ import { SendgridService } from '../email/SendgridService';
     PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '86400s' },
+      signOptions: { expiresIn: process.env.JWT_EXPIRE || '86400s' },
     }),
   ],
   providers: [
