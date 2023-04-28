@@ -104,6 +104,69 @@ export class SessionService {
     };
   }
 
+  async getNext(sessionId: string): Promise<any> {
+    const sessionRecord = await this.sessionRepository.findOne({
+      where: {
+        id: sessionId,
+        status: Session.START_SESSION,
+      },
+    });
+    if (!sessionRecord) {
+      throw new BadRequestException('session not found');
+    }
+    const queries: Promise<any>[] = [];
+
+    queries.push(
+      this.sessionQuestionRepository.countBy({
+        session_id: sessionId,
+      }),
+    );
+
+    queries.push(
+      this.questionRepository
+        .createQueryBuilder('questions')
+        .leftJoin('questions.sessionQuestions', 'sq', 'sq.session_id = :sid', {
+          sid: sessionId,
+        })
+        .innerJoin('question_test', 'qt', 'qt.question_id = questions.id')
+        .where('qt.test_id = :testId', { testId: sessionRecord.test_id })
+        .andWhere('sq.question_id IS NULL')
+        .orderBy('RAND()')
+        .getMany(),
+    );
+
+    queries.push(
+      this.questionRepository
+        .createQueryBuilder('questions')
+        .innerJoin('questions.tests', 'tests')
+        .andWhere('tests.id = :testId', { testId: sessionRecord.test_id })
+        .getCount(),
+    );
+
+    let [countAnsweredQuestions, questions, generalCountQuestions] =
+      await Promise.all(queries);
+
+    questions = questions.slice(0, 2);
+
+    if (generalCountQuestions > SessionService.limitQuestions) {
+      generalCountQuestions = 20;
+    }
+    if (countAnsweredQuestions >= SessionService.limitQuestions) {
+      questions = null;
+    }
+    if (questions === null) {
+      sessionRecord.status = Session.COMPLETE_SESSION;
+      await this.sessionRepository.save(sessionRecord);
+    }
+
+    return {
+      questions,
+      count: generalCountQuestions,
+      countAnswered: countAnsweredQuestions,
+      test_id: sessionRecord.test_id,
+    };
+  }
+
   async getSession(sessionId: string) {
     const sessionRecord = await this.sessionRepository
       .createQueryBuilder('test_sessions')
