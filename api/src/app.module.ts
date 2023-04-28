@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { TestsModule } from './tests/tests.module';
 import { SessionsModule } from './test-session/sessions.module';
 import { LikeModule } from './likecounter/like.module';
+import { RoadmapModule } from './roadmap/roadmap.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { LikeModule } from './likecounter/like.module';
       }),
     }),
     AuthModule,
+    RoadmapModule,
   ],
   controllers: [AppController],
   providers: [AppService],

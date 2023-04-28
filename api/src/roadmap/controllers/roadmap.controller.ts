@@ -1,12 +1,19 @@
-import { Controller, Get, Request } from '@nestjs/common';
+import { Controller, Get, Query, Request } from '@nestjs/common';
 import { RoadmapService } from '../roadmap.service';
+import { Roles } from 'src/auth/rbac/roles.decorator';
+import { Role } from 'src/auth/rbac/role.enum';
+import { QueryPositionDto } from '../validation/QueryPositionDto';
 
-@Controller()
+@Controller('roadmap')
 export class RoadmapController {
     constructor(private roadmapService: RoadmapService){}
     
-    @Get('roadmap')
-    get(@Request() req) {
-        this.roadmapService.get();
+    // @Roles(Role.Admin, Role.User)
+    @Get()
+    get(@Query() query: QueryPositionDto): string {
+        const { positionId } = query;
+        console.log(positionId);
+        
+        return this.roadmapService.get();
     }
 }
