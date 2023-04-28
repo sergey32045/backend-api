@@ -1,10 +1,9 @@
 import { AttachmentsService } from '../attachments.service';
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
-import { Roles } from '../../auth/rbac/roles.decorator';
-import { Role } from '../../auth/rbac/role.enum';
+import { Roles, Role } from '../../auth/rbac';
 import { CreateAttachmentDto } from '../validation/CreateAttachmentDto';
-import { Attachment } from '../models/attachment.entity';
+import { Attachment } from '../models';
 
 @Controller('attachments')
 export class AttachmentsController {

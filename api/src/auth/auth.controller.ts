@@ -13,6 +13,7 @@ import { RegisterUserDto } from './validation/RegisterUserDto';
 import { UsersService } from '../users/users.service';
 import { EmailConfirmationService } from './email/email-confirmation.service';
 import ConfirmEmailDto from './validation/ConfirmEmailDto';
+import { Roles, Role } from './rbac';
 
 @Controller('auth')
 export class AuthController {
@@ -23,12 +24,14 @@ export class AuthController {
   ) {}
 
   @UseGuards(LocalAuthGuard)
+  @Roles(Role.Guest)
   @Post('login')
   async login(@Request() req): Promise<{ accessToken: string }> {
     return this.authService.login(req.user);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
+  @Roles(Role.Guest)
   @Post('register')
   async register(@Body() registerUserDto: RegisterUserDto) {
     const user = await this.userService.create(registerUserDto);
@@ -36,6 +39,7 @@ export class AuthController {
   }
 
   @Post('confirm')
+  @Roles(Role.Guest)
   async confirm(@Body() confirmationData: ConfirmEmailDto) {
     const email = await this.emailConfirmationService.decodeConfirmationToken(
       confirmationData.token,

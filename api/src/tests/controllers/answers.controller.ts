@@ -18,8 +18,7 @@ import {
   GetAnswersParams,
   UpdateAnswerDto,
 } from '../validation';
-import { Roles } from '../../auth/rbac/roles.decorator';
-import { Role } from '../../auth/rbac/role.enum';
+import { Roles, Role } from '../../auth/rbac';
 import {
   CustomClassSerializerInterceptor,
   CustomSerializeOptions,

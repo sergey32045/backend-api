@@ -14,8 +14,7 @@ import {
 import { ApiResponse } from '@nestjs/swagger';
 import { TestService } from '../test.service';
 import { Label } from '../models';
-import { Roles } from '../../auth/rbac/roles.decorator';
-import { Role } from '../../auth/rbac/role.enum';
+import { Roles, Role } from '../../auth/rbac';
 import { CreateLabelDto, QueryLabelsDto } from '../validation';
 
 @Controller('labels')
