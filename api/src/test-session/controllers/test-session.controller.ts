@@ -7,15 +7,23 @@ import {
   Post,
   Request,
   UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { SessionService } from '../services/session.service';
 import { Session } from '../models/session.entity';
 import { SaveSessionAnswerDto, StartSessionDto } from '../validation';
+import { Roles } from 'src/auth/rbac/roles.decorator';
+import { Role } from 'src/auth/rbac/role.enum';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/rbac/roles.guard';
 
 @Controller('sessions')
 export class TestSessionController {
   constructor(private sessionService: SessionService) {}
+
+  @Roles(Role.Admin, Role.User)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiResponse({
     status: 201,
     description: 'Session records',
@@ -30,6 +38,8 @@ export class TestSessionController {
     return this.sessionService.startSession(data);
   }
 
+  @Roles(Role.Admin, Role.User)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiResponse({
     status: 200,
     description: 'Session records',
@@ -45,6 +55,8 @@ export class TestSessionController {
     return this.sessionService.saveAnswer(sessionId, data);
   }
 
+  @Roles(Role.Admin, Role.User)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiResponse({
     status: 200,
     description: 'Session record',
@@ -56,6 +68,8 @@ export class TestSessionController {
     return this.sessionService.getNextQuestion(sessionId);
   }
 
+  @Roles(Role.Admin, Role.User)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiResponse({
     status: 200,
     description: 'Session record',
