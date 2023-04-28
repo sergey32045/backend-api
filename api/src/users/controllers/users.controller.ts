@@ -1,21 +1,20 @@
 import {
-  Controller,
-  Request,
-  Get,
-  UseGuards,
-  UseInterceptors,
   ClassSerializerInterceptor,
+  Controller,
+  Get,
+  Request,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from '../users.service';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { Role, Roles } from '../../auth/rbac';
 
 @Controller()
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
-  @UseGuards(JwtAuthGuard)
   @Get('users')
+  @Roles(Role.Admin)
   async getUsers(@Request() req) {
     return this.usersService.findAll();
   }

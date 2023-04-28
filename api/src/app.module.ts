@@ -9,6 +9,8 @@ import { AuthModule } from './auth/auth.module';
 import { TestsModule } from './tests/tests.module';
 import { SessionsModule } from './test-session/sessions.module';
 import { LikeModule } from './likecounter/like.module';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -39,6 +41,12 @@ import { LikeModule } from './likecounter/like.module';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD, //  regardless of the module where this construction is employed, the guard is, in fact, global
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

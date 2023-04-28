@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Request,
-  UseGuards,
   UseInterceptors,
   Query,
   Post,
@@ -13,13 +12,11 @@ import {
   Req,
   Delete,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { TestService } from '../test.service';
 import { CreateTestDto, UpdateTestDto, QueryTestsDto } from '../validation';
 import { ApiResponse } from '@nestjs/swagger';
-import { Test } from '../models/test.entity';
-import { Role } from '../../auth/rbac/role.enum';
-import { Roles } from '../../auth/rbac/roles.decorator';
+import { Test } from '../models';
+import { Role, Roles } from '../../auth/rbac';
 
 @Controller('tests')
 export class TestController {
@@ -58,7 +55,6 @@ export class TestController {
     return this.testService.update(id, testData);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Roles(Role.Admin)
   @Delete(':id')
   async delete(@Param('id') id: number) {

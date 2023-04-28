@@ -11,8 +11,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
-import { Roles } from '../../auth/rbac/roles.decorator';
-import { Role } from '../../auth/rbac/role.enum';
+import { Roles, Role } from '../../auth/rbac';
 import { Position } from '../models';
 import { CreatePositionDto } from '../validation/CreatePositionDto';
 import { PositionsService } from '../positions.service';
