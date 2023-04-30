@@ -53,18 +53,18 @@ export class TestSessionController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':sessionId/next-question')
   async getNextQuestion(@Request() req, @Param('sessionId') sessionId: string) {
-    return this.sessionService.getNextQuestion(sessionId);
+    return this.sessionService.getNextQuestion(sessionId, 1);
   }
 
   @ApiResponse({
     status: 200,
     description: 'Session record',
-    type: Session,
+    type: [Session],
   })
   @UseInterceptors(ClassSerializerInterceptor)
-  @Get(':sessionId/next')
-  async getNext(@Request() req, @Param('sessionId') sessionId: string) {
-    return this.sessionService.getNext(sessionId);
+  @Get(':sessionId/next-questions')
+  async getNextQuestions(@Request() req, @Param('sessionId') sessionId: string) {
+    return this.sessionService.getNextQuestion(sessionId, 2);
   }
 
   @ApiResponse({
