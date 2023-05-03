@@ -8,7 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GoogleOauthController } from './google/google-oauth.controller';
 import { GoogleOauthStrategy } from './google/google-oauth.strategy';
 import { EmailConfirmationService } from './email/email-confirmation.service';
@@ -19,9 +19,16 @@ import { SendgridService } from '../email/SendgridService';
     ConfigModule,
     UsersModule,
     PassportModule,
-    JwtModule.register({
-      secret: jwtConstants.secret,
-      signOptions: { expiresIn: process.env.JWT_EXPIRE || '86400s' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      
+      useFactory: async (configService: ConfigService) => ({
+        secretOrPrivateKey: configService.get<string>('jwt.secret'),
+        signOptions: {
+          expiresIn: +configService.get<number>('jwt.expiresIn') | 86400
+        }
+      }),
     }),
   ],
   providers: [
