@@ -63,7 +63,10 @@ export class TestSessionController {
   })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':sessionId/next-questions')
-  async getNextQuestions(@Request() req, @Param('sessionId') sessionId: string) {
+  async getNextQuestions(
+    @Request() req,
+    @Param('sessionId') sessionId: string,
+  ) {
     return this.sessionService.getNextQuestion(sessionId, 2);
   }
 

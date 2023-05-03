@@ -72,7 +72,7 @@ export class SessionService {
         .andWhere('sq.question_id IS NULL')
         .limit(limit)
         .orderBy('RAND()')
-        .getOne(),
+        .getMany(),
     );
 
     queries.push(
