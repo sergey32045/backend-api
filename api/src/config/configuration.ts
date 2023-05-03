@@ -1,3 +1,4 @@
+require('dotenv').config();
 export default () => ({
   database: {
     host: process.env.DB_HOST,
