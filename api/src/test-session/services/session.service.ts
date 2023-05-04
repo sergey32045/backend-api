@@ -70,6 +70,15 @@ export class SessionService {
         .innerJoin('question_test', 'qt', 'qt.question_id = questions.id')
         .where('qt.test_id = :testId', { testId: sessionRecord.test_id })
         .andWhere('sq.question_id IS NULL')
+        .andWhere(
+          'questions.id NOT IN ' +
+            this.questionRepository
+              .createQueryBuilder('q')
+              .select('sq.question_id')
+              .from('session_question', 'sq')
+              .where('sq.session_id = :sid', { sid: sessionId })
+              .getQuery(),
+        )
         .limit(limit)
         .orderBy('RAND()')
         .getMany(),
