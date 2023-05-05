@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Request,
-  UseGuards,
   UseInterceptors,
   Post,
   Body,
@@ -12,13 +11,11 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { TestService } from '../test.service';
 import { CreateCategoryDto, QueryCategoriesDto } from '../validation';
 import { ApiResponse } from '@nestjs/swagger';
 import { TestCategory } from '../models';
-import { Roles } from '../../auth/rbac/roles.decorator';
-import { Role } from '../../auth/rbac/role.enum';
+import { Roles, Role } from '../../auth/rbac';
 
 @Controller('test-categories')
 export class CategoriesController {
@@ -45,7 +42,6 @@ export class CategoriesController {
     return this.testService.updateCategory(id, categoryData);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
   @ApiResponse({
     status: 200,

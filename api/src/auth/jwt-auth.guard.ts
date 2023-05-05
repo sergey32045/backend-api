@@ -1,11 +1,12 @@
 import {
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
-import { Role } from './rbac/role.enum';
+import { Role } from './rbac';
 import { ROLES_KEY } from './rbac/roles.decorator';
 
 @Injectable()
@@ -37,16 +38,20 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       context.getHandler(),
       context.getClass(),
     ]);
-    if (!requiredRoles) {
-      return true;
-    }
     if (await super.canActivate(context)) {
+      const { user } = context.switchToHttp().getRequest();
+
+      if (!requiredRoles) {
+        return true;
+      }
       if (requiredRoles.some((role) => role === Role.Guest)) {
         return true;
       }
-
-      const { user } = context.switchToHttp().getRequest();
-      return requiredRoles.some((role) => user?.roles?.includes(role));
+      const hasRole = requiredRoles.some((role) => user?.roles?.includes(role));
+      if (!hasRole) {
+        throw new ForbiddenException();
+      }
+      return true;
     }
 
     return false;

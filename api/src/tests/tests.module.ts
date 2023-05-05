@@ -15,8 +15,6 @@ import { CategoriesController } from './controllers/categories.controller';
 import { QuestionsController } from './controllers/questions.controller';
 import { LabelsController } from './controllers/labels.controller';
 import { AnswersController } from './controllers/answers.controller';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { S3FileService } from './S3/s3-file.service';
 import { ConfigModule } from '@nestjs/config';
 import { AttachmentsController } from './controllers/attachments.controller';
@@ -37,16 +35,7 @@ import { PositionsService } from './positions.service';
       Position,
     ]),
   ],
-  providers: [
-    TestService,
-    S3FileService,
-    AttachmentsService,
-    PositionsService,
-    {
-      provide: APP_GUARD,
-      useClass: JwtAuthGuard,
-    },
-  ],
+  providers: [TestService, S3FileService, AttachmentsService, PositionsService],
   controllers: [
     TestController,
     CategoriesController,

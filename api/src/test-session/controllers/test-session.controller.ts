@@ -16,6 +16,7 @@ import { SaveSessionAnswerDto, StartSessionDto } from '../validation';
 @Controller('sessions')
 export class TestSessionController {
   constructor(private sessionService: SessionService) {}
+
   @ApiResponse({
     status: 201,
     description: 'Session records',

@@ -1,3 +1,4 @@
+require('dotenv').config();
 export default () => ({
   database: {
     host: process.env.DB_HOST,
@@ -20,5 +21,9 @@ export default () => ({
   aws: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+  jwt: {
+    expiresIn: process.env.JWT_EXPIRE,
+    secret: process.env.JWT_SECRET,
   },
 });

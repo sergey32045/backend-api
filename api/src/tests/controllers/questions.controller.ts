@@ -13,15 +13,13 @@ import {
 import { TestService } from '../test.service';
 import { S3FileService } from '../S3/s3-file.service';
 import { ApiResponse } from '@nestjs/swagger';
-import { Test } from '../models/test.entity';
-import { Question } from '../models/question.entity';
+import { Test, Question } from '../models';
 import {
   CreateQuestionDto,
   GetQuestionsParams,
   UpdateQuestionDto,
 } from '../validation';
-import { Roles } from '../../auth/rbac/roles.decorator';
-import { Role } from '../../auth/rbac/role.enum';
+import { Roles, Role } from '../../auth/rbac';
 import { AttachmentsService } from '../attachments.service';
 
 @Controller('tests/:testid/questions')
