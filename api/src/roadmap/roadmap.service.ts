@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class RoadmapService {
-  get(): string {
-    console.log('here');
+  get(): object {
     
-    return 'hi';
+    return {
+      'd': 'hi'
+    };
   }
 }

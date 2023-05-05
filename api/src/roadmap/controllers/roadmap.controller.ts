@@ -10,7 +10,7 @@ export class RoadmapController {
     
     // @Roles(Role.Admin, Role.User)
     @Get()
-    get(@Query() query: QueryPositionDto): string {
+    get(@Query() query: QueryPositionDto) {
         const { positionId } = query;
         console.log(positionId);
         
