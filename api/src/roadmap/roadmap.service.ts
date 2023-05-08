@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { CategoryType } from './types';
+import { CategoryStatus } from './types';
 
 @Injectable()
 export class RoadmapService {
@@ -8,36 +8,56 @@ export class RoadmapService {
     
     return {
       'roadmapCategory': {
+        'id': 1,
         'name': 'Web Development',
-        'categoryTypes': [
+        'status': CategoryStatus.ACTIVE,
+        'parent_id': null,
+        'children': [
           {
+            'id': 2,
             'name': 'Front-End Developer',
-            'type': CategoryType.ACTIVE,
-            'categoryTopics': [
+            'status': CategoryStatus.ACTIVE,
+            'parent_id': 1,
+            'children': [
               {
+                'id': 3,
                 'name': 'JavaScript [ Basic ]',
                 'role': 'Frontend JS Dev',
-                'topics': [
+                'status': CategoryStatus.ACTIVE,
+                'parent_id': 2,
+                'children': [
                   {
+                    'id': 4,
                     'name': 'Fundamentals',
-                    'keyTopics': [
+                    'parent_id': 3,
+                    'children': [
                       [
                         {
+                          'id': 5,
                           'name': 'Data types',
-                          'labels': [
+                          'parent_id': 4,
+                          'children': [
                             {
+                              'id': 7,
                               'name': 'Basic data types',
+                              'parent_id': 5,
                               'isPassed': true,
+                              'status': CategoryStatus.ACTIVE,
                             },
                             {
+                              'id': 8,
                               'name': 'Numbers',
+                              'parent_id': 5,
                               'isPassed': false,
+                              'status': CategoryStatus.ACTIVE,
                             },
                           ]
                         },
                         {
+                          'id': 6,
                           'name': 'Type conversions',
-                          'labels': [
+                          'parent_id': 4,
+                          'children': [
                             '...'
                           ]
                         }
@@ -47,9 +67,10 @@ export class RoadmapService {
                 ]
               },
               {
+                'id': 10,
                 'name': 'JavaScript [ Basic ]',
                 'role': 'Frontend JS Dev / Engineer',
-                'topics': [
+                'children': [
                   '...'
                 ]
               }
@@ -58,8 +79,9 @@ export class RoadmapService {
           
           {
             'name': 'Back-End Developer',
-            'type': CategoryType.DISABLED,
-            'categoryTopics': [
+            'type': CategoryStatus.INACTIVE,
+            'parent_id': 1,
+            'children': [
               '...'
             ]
           }

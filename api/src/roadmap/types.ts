@@ -1,5 +1,5 @@
-export enum CategoryType {
+export enum CategoryStatus {
     COMPLETED = 'completed',
     ACTIVE = 'active',
-    DISABLED = 'disabled',
+    INACTIVE = 'inactive',
 }
