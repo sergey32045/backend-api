@@ -6,12 +6,12 @@ import { QueryPositionDto } from '../validation/QueryPositionDto';
 
 @Controller('roadmap')
 export class RoadmapController {
-    constructor(private roadmapService: RoadmapService){}
-    
-    // @Roles(Role.Admin, Role.User)
-    @Get()
-    get(@Query() query: QueryPositionDto) {
-        const { positionId } = query;        
-        return this.roadmapService.getRoadmap(positionId);
-    }
+  constructor(private roadmapService: RoadmapService) {}
+
+  // @Roles(Role.Admin, Role.User)
+  @Get()
+  get(@Query() query: QueryPositionDto) {
+    const { positionId } = query;
+    return this.roadmapService.getRoadmap(positionId);
+  }
 }

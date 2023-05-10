@@ -1,9 +1,9 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class QueryPositionDto {
-    @ApiProperty({
-        example: 1,
-        description: 'Position ID'
-    })
-    positionId: number;
+  @ApiProperty({
+    example: 1,
+    description: 'Position ID',
+  })
+  positionId: number;
 }
