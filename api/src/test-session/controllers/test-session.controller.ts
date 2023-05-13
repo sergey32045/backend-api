@@ -35,7 +35,7 @@ export class TestSessionController {
     @Request() req,
     @Body() data: StartSessionDto,
   ): Promise<Session> {
-    return this.sessionService.startSession(data);
+    return this.sessionService.startSession(req.user, data);
   }
 
   @ApiResponse({
