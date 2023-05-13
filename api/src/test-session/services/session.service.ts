@@ -30,9 +30,9 @@ export class SessionService {
     private sessionQuestionRepository: Repository<SessionQuestion>,
   ) {}
 
-  async startSession(user: User, data: StartSessionDto) {
+  async startSession(user, data: StartSessionDto) {
     
-    if (!user || !user.id) {
+    if (!user || !user.userId) {
       throw new BadRequestException('user not defined');
     }
 
@@ -44,7 +44,7 @@ export class SessionService {
       const session = new Session();
       session.status = Session.START_SESSION;
       session.test_id = testRecord.id;
-      session.user_id = user.id;
+      session.user_id = user.userId;
       return this.sessionRepository.save(session);
     }
     throw new BadRequestException('test not found');
