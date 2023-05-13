@@ -10,7 +10,6 @@ import { SaveSessionAnswerDto, StartSessionDto } from '../validation';
 import { Answer } from '../../tests/models/answer.entity';
 import { Question } from '../../tests/models/question.entity';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { User } from 'src/users/models/user.entity';
 
 export class SessionService {
   static readonly limitQuestions = 20;
@@ -32,7 +31,7 @@ export class SessionService {
 
   async startSession(user, data: StartSessionDto) {
     
-    if (!user || !user.userId) {
+    if (!user?.userId) {
       throw new BadRequestException('user not defined');
     }
 
