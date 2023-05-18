@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { RequestMethod, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+console.log(process.env, 'process.env');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -14,7 +15,6 @@ async function bootstrap() {
   );
   app.enableCors();
 
-  console.log(process.env, 'process.env');
   const config = new DocumentBuilder()
     .setTitle('InterviewBoom API doc')
     .setDescription('InterviewBoom API')
