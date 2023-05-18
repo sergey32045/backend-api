@@ -1,8 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { RequestMethod, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-console.log(process.env, 'process.env');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -22,7 +21,7 @@ async function bootstrap() {
     .addTag('users')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('/api/doc', app, document);
+  SwaggerModule.setup('/documentation-api', app, document);
 
   await app.listen(3000);
 }
