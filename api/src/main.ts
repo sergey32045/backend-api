@@ -14,6 +14,7 @@ async function bootstrap() {
   );
   app.enableCors();
 
+  console.log(process.env, 'process.env');
   const config = new DocumentBuilder()
     .setTitle('InterviewBoom API doc')
     .setDescription('InterviewBoom API')
