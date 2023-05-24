@@ -4,6 +4,10 @@ export class AddIndexTestSessionsTable1683925693816 implements MigrationInterfac
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
+            UPDATE test_sessions SET user_id = (SELECT MIN(id) FROM users WHERE JSON_SEARCH(roles, 'one', 'admin') IS NOT null) WHERE user_id is null;
+        `)
+
+        await queryRunner.query(`
             ALTER TABLE test_sessions MODIFY COLUMN user_id INT UNSIGNED NOT NULL;
         `)
 
