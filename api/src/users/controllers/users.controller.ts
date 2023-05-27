@@ -15,7 +15,10 @@ import { UpdateUserProfileDto } from '../validation';
 
 @Controller()
 export class UsersController {
-  constructor(private usersService: UsersService, private userProfilesServide: UserProfilesService) {}
+  constructor(
+    private usersService: UsersService,
+    private userProfilesServide: UserProfilesService,
+  ) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('users')
@@ -26,7 +29,10 @@ export class UsersController {
 
   @Put('user/:id')
   @Roles(Role.Admin, Role.User)
-  async updateUser(@Body() updateUserProfileDto: UpdateUserProfileDto, @Param('id') id: number) {
+  async updateUser(
+    @Body() updateUserProfileDto: UpdateUserProfileDto,
+    @Param('id') id: number,
+  ) {
     return this.userProfilesServide.update(updateUserProfileDto, id);
   }
 }

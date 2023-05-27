@@ -35,8 +35,10 @@ export class UserProfilesService {
   }
 
   async update(profileData: UpdateUserProfileDto, userId: number) {
-    const userProfile = await this.usersProfileRepository.findOne({ where: { userId } });
-    
+    const userProfile = await this.usersProfileRepository.findOne({
+      where: { userId },
+    });
+
     if (!userProfile) {
       throw new BadRequestException("Profile doesn't exists");
     }
