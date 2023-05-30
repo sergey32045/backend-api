@@ -28,6 +28,7 @@ export class TestController {
     type: [Test],
   })
   @UseInterceptors(ClassSerializerInterceptor)
+  @Roles(Role.Guest)
   @Get()
   async getAll(@Request() req, @Query() query: QueryTestsDto) {
     return this.testService.findAll(query);

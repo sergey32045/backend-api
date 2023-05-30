@@ -15,7 +15,7 @@ env:
   ECR_REPOSITORY_NGINX: interviewboom-nginx
   ECR_REPOSITORY_DB: interviewboom-db
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-  NODE_VERSION: 16
+  NODE_VERSION: 20
 
 jobs:
   deploy:
