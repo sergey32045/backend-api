@@ -7,15 +7,15 @@ COPY ./api/package*.json ./
 RUN #apk add --update python3 make g++ && rm -rf /var/cache/apk/*
 
 RUN apk add --no-cache make gcc g++ python3 && \
-  npm rebuild bcrypt --build-from-source && \
+  yarn add bcrypt --force --build-from-source && \
   apk del make gcc g++ python3
 
-RUN npm install -g glob rimraf ts-node @nestjs/cli && \
-    npm install --only=development
+RUN yarn global add glob rimraf ts-node @nestjs/cli && \
+    yarn install --only=development
 
 COPY ./api .
 
-RUN npm run build
+RUN yarn run build
 
 FROM node:20-alpine AS production
 
@@ -26,14 +26,13 @@ WORKDIR /usr/src/app
 
 COPY ./api/package*.json ./
 
-RUN npm install -g glob rimraf ts-node @nestjs/cli && \
-    npm install --only=production
+RUN yarn global add glob rimraf ts-node @nestjs/cli && \
+    yarn install --only=production
 
 COPY ./api .
 
-RUN npm run build
+RUN yarn run build
 
 EXPOSE 3000
 
 CMD ["node", "dist/src/main"]
-#RUN npm run build
