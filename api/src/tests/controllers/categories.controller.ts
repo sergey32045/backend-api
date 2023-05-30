@@ -23,6 +23,12 @@ export class CategoriesController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
+  @Roles(Role.Guest)
+  @ApiResponse({
+    status: 200,
+    description: 'Get all categories',
+    type: [TestCategory],
+  })
   async getAll(@Request() req, @Query() query: QueryCategoriesDto) {
     return this.testService.findAllCategories(query);
   }
@@ -48,6 +54,7 @@ export class CategoriesController {
     description: 'The found record',
     type: TestCategory,
   })
+  @Roles(Role.Guest)
   async get(@Param('id') id: number) {
     return this.testService.findOneCategory(id);
   }

@@ -9,11 +9,10 @@ import {
 } from '@nestjs/common';
 import { LocalAuthGuard } from './local-auth.guard';
 import { AuthService } from './auth.service';
-import { RegisterUserDto } from './validation/RegisterUserDto';
 import { UsersService } from '../users/users.service';
 import { EmailConfirmationService } from './email/email-confirmation.service';
-import ConfirmEmailDto from './validation/ConfirmEmailDto';
 import { Roles, Role } from './rbac';
+import { RegisterUserDto, ConfirmEmailDto } from './validation';
 
 @Controller('auth')
 export class AuthController {
