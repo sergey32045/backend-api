@@ -30,7 +30,6 @@ export class SessionService {
   ) {}
 
   async startSession(user, data: StartSessionDto) {
-    
     if (!user?.userId) {
       throw new BadRequestException('user not defined');
     }
@@ -97,8 +96,9 @@ export class SessionService {
         .getCount(),
     );
 
-    let [countAnsweredQuestions, questions, generalCountQuestions] =
-      await Promise.all(queries);
+    const [countAnsweredQuestions, ...rest] = await Promise.all(queries);
+
+    let [questions, generalCountQuestions] = rest;
 
     if (generalCountQuestions > SessionService.limitQuestions) {
       generalCountQuestions = 20;

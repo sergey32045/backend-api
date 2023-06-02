@@ -31,7 +31,9 @@ describe('test.service', () => {
         },
         {
           provide: getRepositoryToken(TestCategory),
-          useFactory: jest.fn(() => {}),
+          useFactory: jest.fn(() => {
+            return;
+          }),
         },
       ],
     }).compile();

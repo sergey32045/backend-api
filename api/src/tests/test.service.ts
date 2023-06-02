@@ -310,7 +310,7 @@ export class TestService {
       }
     }
     if (categoryData.name) {
-      let where = { name: categoryData.name };
+      const where = { name: categoryData.name };
       if (id) {
         where['id'] = Not(id);
       }
