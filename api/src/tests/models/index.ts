@@ -1,4 +1,4 @@
-export { Position } from './position.entity';
+export { ComplexityLevels } from './complexity-levels.entity';
 export { Attachment } from './attachment.entity';
 export { Test } from './test.entity';
 export { TestCategory } from './test-category.entity';

@@ -14,7 +14,7 @@ import { Answer } from './answer.entity';
 import { SessionQuestion } from '../../test-session/models/session.entity';
 import { Expose, Transform } from 'class-transformer';
 import { Attachment } from './attachment.entity';
-import { Position } from './position.entity';
+import { ComplexityLevels } from './complexity-levels.entity';
 import { mapEntityToIds } from '../../common/validation.helper';
 
 @Entity('questions')
@@ -67,13 +67,13 @@ export class Question {
 
   @Expose({ name: 'positions' })
   @Transform(({ value }) => mapEntityToIds(value))
-  @ManyToMany(() => Position)
+  @ManyToMany(() => ComplexityLevels)
   @JoinTable({
     name: 'question_positions',
     joinColumn: { name: 'question_id', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'position_id', referencedColumnName: 'id' },
   })
-  positions: Position[];
+  positions: ComplexityLevels[];
 
   @OneToMany(
     () => SessionQuestion,

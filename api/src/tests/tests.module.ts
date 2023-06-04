@@ -9,7 +9,7 @@ import {
   Label,
   Answer,
   Attachment,
-  Position,
+  ComplexityLevels,
 } from './models/';
 import { CategoriesController } from './controllers/categories.controller';
 import { QuestionsController } from './controllers/questions.controller';
@@ -19,8 +19,8 @@ import { S3FileService } from './S3/s3-file.service';
 import { ConfigModule } from '@nestjs/config';
 import { AttachmentsController } from './controllers/attachments.controller';
 import { AttachmentsService } from './attachments.service';
-import { PositionsController } from './controllers/positions.controller';
-import { PositionsService } from './positions.service';
+import { ComplexityLevelsController } from './controllers/complexity-levels.controller';
+import { ComplexityLevelsService } from './complexity-levels.service';
 
 @Module({
   imports: [
@@ -32,10 +32,15 @@ import { PositionsService } from './positions.service';
       Label,
       Answer,
       Attachment,
-      Position,
+      ComplexityLevels,
     ]),
   ],
-  providers: [TestService, S3FileService, AttachmentsService, PositionsService],
+  providers: [
+    TestService,
+    S3FileService,
+    AttachmentsService,
+    ComplexityLevelsService,
+  ],
   controllers: [
     TestController,
     CategoriesController,
@@ -43,7 +48,7 @@ import { PositionsService } from './positions.service';
     LabelsController,
     AnswersController,
     AttachmentsController,
-    PositionsController,
+    ComplexityLevelsController,
   ],
   exports: [TestService, TypeOrmModule],
 })
