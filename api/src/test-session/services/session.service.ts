@@ -30,7 +30,6 @@ export class SessionService {
   ) {}
 
   async startSession(user, data: StartSessionDto) {
-    
     if (!user?.userId) {
       throw new BadRequestException('user not defined');
     }
