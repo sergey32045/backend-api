@@ -11,7 +11,7 @@ export class RoadmapController {
   // @Roles(Role.Admin, Role.User)
   @Get()
   get(@Query() query: QueryPositionDto) {
-    const { positionId } = query;
-    return this.roadmapService.getRoadmap(positionId);
+    const { complexityLevelId } = query;
+    return this.roadmapService.getRoadmap(complexityLevelId);
   }
 }

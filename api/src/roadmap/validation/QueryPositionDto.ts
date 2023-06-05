@@ -5,5 +5,5 @@ export class QueryPositionDto {
     example: 1,
     description: 'Position ID',
   })
-  positionId: number;
+  complexityLevelId: number;
 }
