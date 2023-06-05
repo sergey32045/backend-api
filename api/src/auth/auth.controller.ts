@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   ClassSerializerInterceptor,
   Controller,
@@ -9,18 +10,21 @@ import {
 } from '@nestjs/common';
 import { LocalAuthGuard } from './local-auth.guard';
 import { AuthService } from './auth.service';
-import { RegisterUserDto } from './validation/RegisterUserDto';
 import { UsersService } from '../users/users.service';
 import { EmailConfirmationService } from './email/email-confirmation.service';
-import ConfirmEmailDto from './validation/ConfirmEmailDto';
 import { Roles, Role } from './rbac';
+import { RegisterUserDto, ConfirmEmailDto } from './validation';
+import { UserProfilesService } from 'src/users/user-profiles.service';
+import { DataSource } from 'typeorm';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private userService: UsersService,
+    private userProfiles: UserProfilesService,
     private emailConfirmationService: EmailConfirmationService,
+    private dataSource: DataSource,
   ) {}
 
   @UseGuards(LocalAuthGuard)
@@ -34,8 +38,21 @@ export class AuthController {
   @Roles(Role.Guest)
   @Post('register')
   async register(@Body() registerUserDto: RegisterUserDto) {
-    const user = await this.userService.create(registerUserDto);
-    await this.emailConfirmationService.sendVerificationLink(user);
+    const queryRunner = this.dataSource.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const user = await this.userService.create(registerUserDto);
+      await this.userProfiles.create(registerUserDto, user.id);
+      await this.emailConfirmationService.sendVerificationLink(user);
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw new BadRequestException('Error while registering user');
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   @Post('confirm')

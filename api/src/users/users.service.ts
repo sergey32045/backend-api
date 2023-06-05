@@ -30,8 +30,8 @@ export class UsersService {
 
   async create(userData: RegisterUserDto) {
     const user = new User();
+
     user.password = userData.password;
-    user.fullName = userData.fullName;
     user.email = userData.email;
     user.roles = [Role.User];
     if (user.email) {

@@ -8,7 +8,7 @@ import {
   Label,
   Answer,
   Attachment,
-  Position,
+  ComplexityLevels,
 } from './models';
 import {
   CreateTestDto,
@@ -42,8 +42,8 @@ export class TestService {
     private answerRepository: Repository<Answer>,
     @InjectRepository(Attachment)
     private attachmentRepository: Repository<Attachment>,
-    @InjectRepository(Position)
-    private positionRepository: Repository<Position>,
+    @InjectRepository(ComplexityLevels)
+    private positionRepository: Repository<ComplexityLevels>,
   ) {}
 
   async getAnswers(params: GetAnswersParams): Promise<Answer[]> {

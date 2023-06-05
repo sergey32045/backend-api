@@ -7,7 +7,7 @@ import {
     Label,
     TestCategory,
     Attachment,
-    Position,
+    ComplexityLevels,
     Question
 } from "./src/tests/models";
 import {Session, SessionAnswer, SessionQuestion} from "./src/test-session/models/session.entity";
@@ -26,7 +26,7 @@ const connectionSource = new DataSource({
     migrations: ['migrations/*{.ts,.js}'],
     entities: [
         Question, Test, Answer, Label, Session,
-        SessionAnswer, SessionQuestion, TestCategory, Attachment, Label, Position
+        SessionAnswer, SessionQuestion, TestCategory, Attachment, Label, ComplexityLevels
     ]
 });
 

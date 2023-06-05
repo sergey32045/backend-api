@@ -29,7 +29,11 @@ export class SessionService {
     private sessionQuestionRepository: Repository<SessionQuestion>,
   ) {}
 
-  async startSession(data: StartSessionDto) {
+  async startSession(user, data: StartSessionDto) {
+    if (!user?.userId) {
+      throw new BadRequestException('user not defined');
+    }
+
     const testRecord = await this.testsRepository.findOne({
       where: { id: data.testId },
     });
@@ -38,12 +42,17 @@ export class SessionService {
       const session = new Session();
       session.status = Session.START_SESSION;
       session.test_id = testRecord.id;
+      session.user_id = user.userId;
       return this.sessionRepository.save(session);
     }
     throw new BadRequestException('test not found');
   }
 
-  async getNextQuestion(sessionId: string): Promise<any> {
+  async getNextQuestion(
+    sessionId: string,
+    limit: number,
+    excludeQuestionIDs: string[] = [],
+  ): Promise<any> {
     const sessionRecord = await this.sessionRepository.findOne({
       where: {
         id: sessionId,
@@ -60,19 +69,24 @@ export class SessionService {
         session_id: sessionId,
       }),
     );
+    const queryQuestion = this.questionRepository
+      .createQueryBuilder('questions')
+      .leftJoin('questions.sessionQuestions', 'sq', 'sq.session_id = :sid', {
+        sid: sessionId,
+      })
+      .innerJoin('question_test', 'qt', 'qt.question_id = questions.id')
+      .where('qt.test_id = :testId', { testId: sessionRecord.test_id })
+      .andWhere('sq.question_id IS NULL')
+      .limit(limit)
+      .orderBy('RAND()');
 
-    queries.push(
-      this.questionRepository
-        .createQueryBuilder('questions')
-        .leftJoin('questions.sessionQuestions', 'sq', 'sq.session_id = :sid', {
-          sid: sessionId,
-        })
-        .innerJoin('question_test', 'qt', 'qt.question_id = questions.id')
-        .where('qt.test_id = :testId', { testId: sessionRecord.test_id })
-        .andWhere('sq.question_id IS NULL')
-        .orderBy('RAND()')
-        .getOne(),
-    );
+    if (excludeQuestionIDs?.length) {
+      queryQuestion.andWhere('questions.id NOT IN (:questionIDs)', {
+        questionIDs: excludeQuestionIDs,
+      });
+    }
+
+    queries.push(queryQuestion.getMany());
 
     queries.push(
       this.questionRepository
@@ -82,22 +96,22 @@ export class SessionService {
         .getCount(),
     );
 
-    let [countAnsweredQuestions, question, generalCountQuestions] =
+    let [countAnsweredQuestions, questions, generalCountQuestions] =
       await Promise.all(queries);
 
     if (generalCountQuestions > SessionService.limitQuestions) {
       generalCountQuestions = 20;
     }
     if (countAnsweredQuestions >= SessionService.limitQuestions) {
-      question = null;
+      questions = null;
     }
-    if (question === null) {
+    if (questions === null) {
       sessionRecord.status = Session.COMPLETE_SESSION;
       await this.sessionRepository.save(sessionRecord);
     }
 
     return {
-      question,
+      questions,
       count: generalCountQuestions,
       countAnswered: countAnsweredQuestions,
       test_id: sessionRecord.test_id,

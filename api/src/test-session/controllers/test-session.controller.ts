@@ -5,16 +5,23 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Request,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { SessionService } from '../services/session.service';
 import { Session } from '../models/session.entity';
-import { SaveSessionAnswerDto, StartSessionDto } from '../validation';
+import {
+  SaveSessionAnswerDto,
+  StartSessionDto,
+  QuerySessionQuestionDto,
+} from '../validation';
 
 @Controller('sessions')
 export class TestSessionController {
+  private readonly LIMIT_QUESTIONS;
+
   constructor(private sessionService: SessionService) {}
 
   @ApiResponse({
@@ -28,7 +35,7 @@ export class TestSessionController {
     @Request() req,
     @Body() data: StartSessionDto,
   ): Promise<Session> {
-    return this.sessionService.startSession(data);
+    return this.sessionService.startSession(req.user, data);
   }
 
   @ApiResponse({
@@ -54,7 +61,34 @@ export class TestSessionController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':sessionId/next-question')
   async getNextQuestion(@Request() req, @Param('sessionId') sessionId: string) {
-    return this.sessionService.getNextQuestion(sessionId);
+    const {
+      questions: [question],
+      ...rest
+    } = await this.sessionService.getNextQuestion(sessionId, 1);
+
+    return {
+      question,
+      ...rest,
+    };
+  }
+
+  @ApiResponse({
+    status: 200,
+    description: 'Session record',
+    type: [Session],
+  })
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get(':sessionId/next-questions')
+  async getNextQuestions(
+    @Request() req,
+    @Param('sessionId') sessionId: string,
+    @Query() query: QuerySessionQuestionDto,
+  ) {
+    return this.sessionService.getNextQuestion(
+      sessionId,
+      this.LIMIT_QUESTIONS,
+      query.excludeQuestionIDs,
+    );
   }
 
   @ApiResponse({

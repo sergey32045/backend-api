@@ -4,18 +4,18 @@ import {
   PrimaryGeneratedColumn,
   BeforeInsert,
   CreateDateColumn,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
 import { Role } from '../../auth/rbac/role.enum';
+import { UserProfile } from './user-profiles.entity';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({ name: 'full_name' })
-  fullName: string;
 
   @Column()
   @Exclude()
