@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToOne,
+  OneToOne,
+} from 'typeorm';
 
 @Entity('roadmap_category')
 export class RoadmapCategory {
@@ -14,4 +21,8 @@ export class RoadmapCategory {
   @ApiProperty({ example: 'active' })
   @Column({ type: 'varchar', length: 50 })
   status: string;
+
+  @OneToOne(() => RoadmapCategory, (category) => category.id)
+  @Column({ name: 'parent_id' })
+  parentId: number;
 }
