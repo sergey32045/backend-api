@@ -6,7 +6,9 @@ export class CreateRoadmapTables1685959223860 implements MigrationInterface {
             CREATE TABLE IF NOT EXISTS roadmap_category (
                 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
-                status VARCHAR(50) NOT NULL
+                status VARCHAR(50) NOT NULL,
+                parent_id INT UNSIGNED,
+                FOREIGN KEY (parent_id) REFERENCES roadmap_category(id)
             )`);
     await queryRunner.query(`
             CREATE TABLE IF NOT EXISTS roadmap_category_progress (
