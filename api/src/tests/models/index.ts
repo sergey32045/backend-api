@@ -5,3 +5,6 @@ export { TestCategory } from './test-category.entity';
 export { Label } from './label.entity';
 export { Answer } from './answer.entity';
 export { Question } from './question.entity';
+export { TestDraft } from './testDraft.entity';
+export { QuestionDraft } from './questionDraft.entity';
+export { AnswerDraft } from './answerDraft.entity';

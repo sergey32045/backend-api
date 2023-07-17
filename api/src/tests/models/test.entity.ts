@@ -51,10 +51,19 @@ export class Test {
   @ManyToOne((type) => TestCategory)
   @JoinColumn({ name: 'test_category_id' })
   category: TestCategory;
-
+  
   @CreateDateColumn()
   created_at: Date;
-
+  
   @UpdateDateColumn()
   updated_at: Date;
+
+  @ApiProperty({ example: true, description: 'Is test published' })
+  @Column({ type: 'boolean' })
+  is_published: boolean;
+
+  @ApiProperty({ example: true, description: 'Is test has draft' })
+  @Column({ type: 'boolean' })
+  has_drafts: boolean;
+  
 }

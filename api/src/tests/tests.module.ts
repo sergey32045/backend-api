@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TestService } from './test.service';
 import { TestController } from './controllers/test.controller';
+import { TestDraftsController } from './controllers/testDrafts.controller';
 import {
   Test,
   Question,
@@ -10,6 +11,7 @@ import {
   Answer,
   Attachment,
   ComplexityLevels,
+  TestDraft
 } from './models/';
 import { CategoriesController } from './controllers/categories.controller';
 import { QuestionsController } from './controllers/questions.controller';
@@ -33,6 +35,7 @@ import { ComplexityLevelsService } from './complexity-levels.service';
       Answer,
       Attachment,
       ComplexityLevels,
+      TestDraft
     ]),
   ],
   providers: [
@@ -43,6 +46,7 @@ import { ComplexityLevelsService } from './complexity-levels.service';
   ],
   controllers: [
     TestController,
+    TestDraftsController,
     CategoriesController,
     QuestionsController,
     LabelsController,

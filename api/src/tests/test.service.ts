@@ -9,6 +9,9 @@ import {
   Answer,
   Attachment,
   ComplexityLevels,
+  TestDraft,
+  QuestionDraft,
+  AnswerDraft,
 } from './models';
 import {
   CreateTestDto,
@@ -44,6 +47,12 @@ export class TestService {
     private attachmentRepository: Repository<Attachment>,
     @InjectRepository(ComplexityLevels)
     private positionRepository: Repository<ComplexityLevels>,
+    @InjectRepository(TestDraft)
+    private testsDraftsRepository: Repository<TestDraft>,
+    @InjectRepository(QuestionDraft)
+    private questionDraftRepository: Repository<QuestionDraft>,
+    @InjectRepository(AnswerDraft)
+    private answerDraftRepository: Repository<AnswerDraft>,
   ) {}
 
   async getAnswers(params: GetAnswersParams): Promise<Answer[]> {
@@ -363,5 +372,238 @@ export class TestService {
 
   async delete(id: number) {
     return this.testsRepository.delete(id);
+  }
+
+  async publishDraft(testId: number) {
+    
+    const questions = await this.questionDraftRepository
+    .createQueryBuilder('questions')
+    .innerJoin('question_test', 'qt', 'qt.question_id = questions.id')
+    .leftJoinAndSelect('questions.positions', 'positions')
+    .where('qt.test_id = :testId', { testId })
+    .getMany();
+
+    await this.questionRepository.upsert(questions, ['id']);
+
+    const answers = await this.answerDraftRepository
+    .createQueryBuilder('answers')
+    .where('id in (:questionIds)', { questionIds: questions.map(question => question.id) }).getMany();
+
+    await this.answerRepository.upsert(answers, ['id'])
+
+    await this.testsRepository
+    .createQueryBuilder()
+    .update(Test)
+    .set({ is_published: true, has_drafts: false, updated_at: new Date() })
+    .where("id = :id", { id: testId })
+    .execute()
+    
+    await this.testsDraftsRepository
+    .createQueryBuilder()
+    .delete()
+    .from(TestDraft)
+    .where("test_id = :test_id", { test_id: testId })
+    .execute()
+  }
+
+  async createDraft(testId: number): Promise<TestDraft> {
+    const draft = new TestDraft();
+
+    const test = await this.testsRepository.findOne({
+        where: {
+            id: testId
+        }
+    });
+
+    test.is_published = false
+    test.has_drafts = true
+    this.testsRepository.save(test)
+
+    draft.test_id = test.id
+    delete test.id
+    Object.assign(draft, test)
+
+    const questions = await this.questionRepository
+    .createQueryBuilder('questions')
+    .innerJoin('question_test', 'qt', 'qt.question_id = questions.id')
+    .leftJoinAndSelect('questions.positions', 'positions')
+    .where('qt.test_id = :testId', { testId })
+    .getMany();
+
+    await this.questionDraftRepository.save(questions);
+
+    const answers = await this.answerRepository
+    .createQueryBuilder('answers')
+    .where('id in (:questionIds)', { questionIds: questions.map(question => question.id) }).getMany();
+
+    await this.answerDraftRepository.save(answers)
+
+    return this.testsDraftsRepository.save(draft)
+  }
+
+  async updateDraft(testId: number, update: UpdateTestDto) {
+    const draft = await this.testsDraftsRepository.findOne({ where: { test_id: testId } });
+    if (!draft) {
+      throw new BadRequestException("Draft doesn't exists");
+    }
+    await this.checkTestData(update);
+
+    draft.title = update.title;
+    draft.description = update.description;
+    draft.test_category_id = update.test_category_id;
+
+    await this.checkTestData(update);
+
+    return this.testsDraftsRepository.save(draft);
+  }
+
+  async deleteDraft(testId: number) {
+    const draft = await this.testsDraftsRepository.findOne({ where: { test_id: testId } });
+    if (!draft) {
+      throw new BadRequestException("Draft doesn't exists");
+    }
+
+    const questions = await this.questionRepository
+    .createQueryBuilder('questions')
+    .innerJoin('question_test', 'qt', 'qt.question_id = questions.id')
+    .leftJoinAndSelect('questions.positions', 'positions')
+    .where('qt.test_id = :testId', { testId })
+    .getMany();
+
+    await this.questionDraftRepository.delete(questions.map(question => question.id));
+
+    const answers = await this.answerRepository
+    .createQueryBuilder('answers')
+    .where('id in (:questionIds)', { questionIds: questions.map(question => question.id) }).getMany();
+
+    await this.answerDraftRepository.delete(answers.map(answer => answer.id))
+
+    return this.testsDraftsRepository.delete(draft.id);
+  }
+
+  async createDraftAnswer(params: GetAnswersParams, data: CreateAnswerDto) {
+    const question = this.questionDraftRepository.findOne({
+      where: { id: params.questionid },
+    });
+    if (!question) {
+      throw new BadRequestException("Question doesn't exists");
+    }
+
+    const answer = new AnswerDraft();
+    answer.question_id = params.questionid;
+    answer.answer = data.answer;
+    answer.is_correct = data.isCorrect;
+
+    return this.answerDraftRepository.save(answer);
+  }
+
+  async updateDraftAnswer(id: number, data: UpdateAnswerDto) {
+    const answer = await this.answerDraftRepository.findOne({ where: { id } });
+    if (!answer) {
+      throw new BadRequestException("Answer doesn't exists");
+    }
+
+    answer.answer = data.answer;
+    answer.is_correct = data.isCorrect;
+
+    return this.answerDraftRepository.save(answer);
+  }
+
+  async deleteDraftAnswer(id: number) {
+    return this.answerDraftRepository.delete(id);
+  }
+
+  async createDraftQuestion(data: CreateQuestionDto) {
+    const question = new QuestionDraft();
+    question.question = data.question;
+    question.title = data.title;
+    question.is_multiselect = data.is_multiselect;
+
+    if (data.labels) {
+      const labels = await this.labelRepository.find({
+        where: { id: In(data.labels) },
+      });
+      question.labels = labels;
+    }
+
+    if (data.testIds) {
+      const tests = await this.testsDraftsRepository.find({
+        where: { test_id: In(data.testIds) },
+      });
+      question.tests = tests;
+    }
+    if (data.files) {
+      const attachments = await this.attachmentRepository.find({
+        where: { id: In(data.files) },
+      });
+      question.attachments = attachments;
+    }
+
+    if (data.positions) {
+      const positions = await this.positionRepository.find({
+        where: { id: In(data.positions) },
+      });
+      question.positions = positions;
+    }
+
+    return this.questionDraftRepository.save(question);
+  }
+
+  async updateDraftQuestion(
+    id: number,
+    data: UpdateQuestionDto,
+  ): Promise<[QuestionDraft, Attachment[]]> {
+    const question = await this.questionDraftRepository.findOne({
+      where: { id },
+      relations: ['answers', 'attachments'],
+    });
+    const oldAttachments = question.attachments;
+
+    if (!question) {
+      throw new BadRequestException("Question doesn't exists");
+    }
+
+    question.question = data.question;
+    question.is_multiselect = data.is_multiselect;
+    question.title = data.title;
+
+    if (
+      !data.is_multiselect &&
+      question.answers?.filter((answer) => answer.is_correct).length > 1
+    ) {
+      throw new BadRequestException('Question has more than one answer');
+    }
+
+    if (data.labels) {
+      const labels = await this.labelRepository.find({
+        where: { id: In(data.labels) },
+      });
+      question.labels = labels;
+    }
+    if (data.testIds) {
+      const tests = await this.testsDraftsRepository.find({
+        where: { id: In(data.testIds) },
+      });
+      question.tests = tests;
+    }
+    if (data.files) {
+      const attachments = await this.attachmentRepository.find({
+        where: { id: In(data.files) },
+      });
+      question.attachments = attachments;
+    }
+
+    if (data.positions) {
+      const positions = await this.positionRepository.find({
+        where: { id: In(data.positions) },
+      });
+      question.positions = positions;
+    }
+
+    return [await this.questionDraftRepository.save(question), oldAttachments];
+  }
+
+  async deleteDraftQuestion(id: number) {
+    return this.questionDraftRepository.delete(id);
   }
 }
